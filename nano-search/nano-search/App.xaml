@@ -1,0 +1,20 @@
+﻿<Application
+    ShutdownMode="OnExplicitShutdown"
+    StartupUri="SearchWindow.xaml"
+    x:Class="NanoSearch.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:local="clr-namespace:NanoSearch"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ui:ControlsDictionary />
+                <ui:ThemesDictionary Theme="Dark" />
+            </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

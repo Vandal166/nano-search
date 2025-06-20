@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+        <ApplicationIcon>resources\nano-search.ico</ApplicationIcon>
+        <UseWindowsForms>true</UseWindowsForms>
+        <RootNamespace>NanoSearch</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <None Update="resources\nano-search.ico">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="WPF-UI" Version="4.0.3" />
+    </ItemGroup>
+
+</Project>
