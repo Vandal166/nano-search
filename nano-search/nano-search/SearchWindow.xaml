@@ -2,13 +2,14 @@
     AllowsTransparency="False"
     Background="Transparent"
     Height="80"
-    MaxHeight="80"
+    MaxHeight="400"
     MinHeight="80"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
+    SizeToContent="Height"
     Title="Search"
     Topmost="True"
-    Width="600"
+    Width="800"
     WindowStyle="None"
     mc:Ignorable="d"
     x:Class="NanoSearch.SearchWindow"
@@ -16,33 +17,158 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:NanoSearch"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:system="clr-namespace:System;assembly=System.Runtime"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <Grid Margin="10">
-        <TextBox
-            Background="Transparent"
-            BorderThickness="0"
-            CaretBrush="White"
-            FontSize="22"
-            FontWeight="SemiBold"
-            Foreground="White"
-            KeyDown="SearchBox_KeyDown"
-            Margin="0"
-            Padding="6,2"
-            SpellCheck.IsEnabled="False"
-            VerticalAlignment="Center"
-            VerticalContentAlignment="Center"
-            x:Name="SearchBox" />
 
-        <TextBlock
-            FontSize="22"
-            Foreground="Gray"
-            IsHitTestVisible="False"
-            Margin="10,0,0,0"
-            SpellCheck.IsEnabled="False"
-            Text="Search apps..."
-            VerticalAlignment="Center"
-            Visibility="{Binding Text.IsEmpty, ElementName=SearchBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!--  Search bar  -->
+        <Grid Margin="10">
+
+            <!--  Input box for search  -->
+            <ui:TextBox
+                Background="Transparent"
+                BorderThickness="0"
+                CaretBrush="White"
+                FontSize="22"
+                FontWeight="SemiBold"
+                Foreground="White"
+                KeyDown="SearchBox_KeyDown"
+                Margin="0"
+                Padding="6,2"
+                SpellCheck.IsEnabled="False"
+                VerticalAlignment="Center"
+                VerticalContentAlignment="Center"
+                x:Name="SearchBox" />
+
+            <ui:TextBlock
+                FontSize="22"
+                Foreground="Gray"
+                IsHitTestVisible="False"
+                Margin="10,0,0,0"
+                SpellCheck.IsEnabled="False"
+                Text="Type in app name or pattern (e.g., *.exe)"
+                VerticalAlignment="Center"
+                Visibility="{Binding Text.IsEmpty, ElementName=SearchBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
+        </Grid>
+
+
+        <!--  Search Results  -->
+        <ScrollViewer
+            Grid.Row="1"
+            Margin="0,10,0,0"
+            VerticalScrollBarVisibility="Auto">
+
+            <ListBox
+                Background="Transparent"
+                BorderThickness="0"
+                Margin="0"
+                Padding="0"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                x:Name="SearchResultsPanel">
+
+                <!--  Container style to handle hover on the whole item  -->
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="Padding" Value="0" />
+                        <Setter Property="Margin" Value="2" />
+                        <Setter Property="Cursor" Value="Hand" />
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border
+                                        Background="#22FFFFFF"
+                                        CornerRadius="8"
+                                        Padding="6"
+                                        x:Name="Bd">
+
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <!--  ContentPresenter will host our DataTemplate  -->
+                                            <ContentPresenter VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" TargetName="Bd" Value="#44FFFFFF" />
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <!--  DataTemplate for each item  -->
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!--  App Icon  -->
+                            <Image
+                                Height="28"
+                                Margin="0,0,10,0"
+                                Source="{Binding Icon}"
+                                VerticalAlignment="Center"
+                                Width="28" />
+
+                            <!--  Text of app name and path  -->
+                            <TextBlock
+                                FontSize="18"
+                                Foreground="White"
+                                Grid.Column="1"
+                                Text="{Binding FileName}"
+                                TextTrimming="CharacterEllipsis"
+                                VerticalAlignment="Center" />
+
+                            <!--  Open in Explorer button  -->
+                            <Button
+                                Background="Transparent"
+                                Command="{Binding OpenCommand}"
+                                CommandParameter="{Binding Path=FullPath}"
+                                Grid.Column="2"
+                                Height="36"
+                                Margin="8,0,20,0"
+                                ToolTip="Open in Explorer"
+                                VerticalAlignment="Center"
+                                Width="36">
+                                <Path
+                                    Data="M3,3 L21,3 L21,21 L3,21 Z M7,7 L17,7 L17,17 L7,17 Z"
+                                    Fill="Transparent"
+                                    IsHitTestVisible="False"
+                                    Stretch="Uniform" />
+                            </Button>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+
+                <!--  Design‑time example items  -->
+                <!--<system:String>Notepad.exe — C:\Windows\System32</system:String>
+                <system:String>Calculator.exe — C:\Windows\System32</system:String>
+                <system:String>msedge.exe — C:\Program Files (x86)\Microsoft\Edge\Application</system:String>
+                <system:String>VisualStudio.exe — D:\Apps\VS2022\Common7\IDE</system:String>
+                <system:String>PowerToys.exe — C:\Program Files\PowerToys</system:String>
+                <system:String>Discord.exe — C:\Users\User\AppData\Local\Discord</system:String>
+                <system:String>Spotify.exe — C:\Users\User\AppData\Roaming\Spotify</system:String>
+                <system:String>File Explorer — C:\Windows\explorer.exe</system:String>
+                <system:String>Settings — C:\Windows\System32\control.exe</system:String>
+                <system:String>Command Prompt — C:\Windows\System32\cmd.exe</system:String>-->
+            </ListBox>
+        </ScrollViewer>
     </Grid>
 </ui:FluentWindow>

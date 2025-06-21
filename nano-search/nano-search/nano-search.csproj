@@ -12,13 +12,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Update="resources\nano-search.ico">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+      <PackageReference Include="WPF-UI" Version="4.0.3" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="WPF-UI" Version="4.0.3" />
+      <None Remove="resources\app-icon-test.ico" />
+      <Resource Include="resources\app-icon-test.ico" />
+      <None Update="resources\nano-search.ico">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
