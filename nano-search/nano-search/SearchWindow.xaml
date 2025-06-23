@@ -39,13 +39,14 @@
                 FontSize="22"
                 FontWeight="SemiBold"
                 Foreground="White"
-                KeyDown="SearchBox_KeyDown"
                 Margin="0"
                 Padding="6,2"
                 SpellCheck.IsEnabled="False"
+                TextChanged="SearchBox_TextChanged"
                 VerticalAlignment="Center"
                 VerticalContentAlignment="Center"
                 x:Name="SearchBox" />
+            <!--  KeyDown="SearchBox_KeyDown"  -->
 
             <ui:TextBlock
                 FontSize="22"
@@ -136,6 +137,8 @@
                                 TextTrimming="CharacterEllipsis"
                                 VerticalAlignment="Center" />
 
+                            <!--  TODO: show light-greyed out path  -->
+
                             <!--  Open in Explorer button  -->
                             <Button
                                 Background="Transparent"
@@ -153,6 +156,27 @@
                                     IsHitTestVisible="False"
                                     Stretch="Uniform" />
                             </Button>
+                            <!--TODO <Button
+                                Background="Transparent"
+                                Command="{Binding OpenCommand}"
+                                CommandParameter="{Binding Path=FullPath}"
+                                Grid.Column="2"
+                                Height="36"
+                                Margin="8,0,20,0"
+                                ToolTip="Open in Explorer"
+                                VerticalAlignment="Center"
+                                Width="36">
+                                <Grid>
+                                    <Image
+                                        Height="20"
+                                        Source="{Binding ExplorerIconSource}"
+                                        Width="20" />
+                                    <Path
+                                        Data="M3,3 L21,3 L21,21 L3,21 Z M7,7 L17,7 L17,17 L7,17 Z"
+                                        Fill="Transparent"
+                                        IsHitTestVisible="False" />
+                                </Grid>
+                            </Button>-->
                         </Grid>
                     </DataTemplate>
                 </ListBox.ItemTemplate>

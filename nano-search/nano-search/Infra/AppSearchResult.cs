@@ -82,7 +82,11 @@ public class AppSearchResult : INotifyPropertyChanged
                 }
             });
 
-            if (iconHandle == IntPtr.Zero) return;
+            if (iconHandle == IntPtr.Zero)
+            {
+                Icon = DefaultIcon;
+                return;
+            }
 
             // Create BitmapSource on UI thread
             Application.Current.Dispatcher.Invoke(() =>
@@ -113,15 +117,37 @@ public class AppSearchResult : INotifyPropertyChanged
         {
             // Log or handle the exception as needed
             Console.WriteLine($"Error loading icon for {FullPath}: {ex.Message}");
-            Icon = null; // Set to null if icon loading fails
+            Icon = DefaultIcon; // Set to null if icon loading fails
         }
     }
-    
+    // Add to AppSearchResult class
+
+    private static readonly ImageSource DefaultIcon = LoadDefaultShellIcon();
+
+    private static ImageSource LoadDefaultShellIcon()
+    {
+        // 0 is usually the standard document icon, 2 is the application icon
+        IntPtr hIcon = ExtractIcon(IntPtr.Zero, "shell32.dll", 2);
+        if (hIcon == IntPtr.Zero)
+            return null!;
+
+        var bitmapSource = Imaging.CreateBitmapSourceFromHIcon(
+            hIcon,
+            Int32Rect.Empty,
+            BitmapSizeOptions.FromEmptyOptions());
+
+        DestroyIcon(hIcon);
+        bitmapSource.Freeze();
+        return bitmapSource;
+    }
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     private static extern bool DestroyIcon(IntPtr handle);
     
     [DllImport("shell32.dll", CharSet = CharSet.Ansi)]
     private static extern IntPtr ExtractAssociatedIconA(IntPtr hInst, StringBuilder pszIconPath, ref ushort piIcon);
+    
+    [DllImport("shell32.dll", CharSet = CharSet.Ansi)]
+    private static extern IntPtr ExtractIcon(IntPtr hInst, string lpszExeFileName, int nIconIndex);
     
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? property = null)

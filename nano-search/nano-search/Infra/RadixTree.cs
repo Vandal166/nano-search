@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Immutable;
+using System.Text.RegularExpressions;
 
 namespace NanoSearch.Algorithms.RadixTrie;
 
@@ -115,6 +116,7 @@ public sealed class RadixTree<T> where T : class
     public T? SearchExact(string key)
     {
         NormalizeKey(ref key);
+        
         return SearchRecursive(root, key, 0, exactMatch: true)?.value;
     }
     
@@ -126,11 +128,10 @@ public sealed class RadixTree<T> where T : class
     }
 
     private void SearchRegexRecursive(
-        RadixNode node, 
-        string currentPath, 
-        Regex regex, 
+        RadixNode node, string currentPath, Regex regex, 
         List<T> results)
     {
+        
         // Check if current path matches regex at any point
         if (regex.IsMatch(currentPath) && node.isEndOfWord && node.value != null)
         {
@@ -145,11 +146,27 @@ public sealed class RadixTree<T> where T : class
         }
     }
 
-    public T? SearchPrefix(string prefix)
+    
+    public ImmutableHashSet<string>? SearchPrefix(string prefix)
     {
-        return SearchRecursive(root, prefix, 0, exactMatch: false)?.value;
-    }
+        NormalizeKey(ref prefix);
+        var nodes = GetAllValuesForPrefix(prefix);
+        
+        if (nodes == null || nodes.Count == 0)
+            return null;
 
+        // Flatten results
+        var builder = ImmutableHashSet.CreateBuilder<string>();
+        foreach (var nodeValue in nodes)
+        {
+            if (nodeValue is ImmutableHashSet<string> paths)
+            {
+                builder.UnionWith(paths);
+            }
+        }
+        return builder.ToImmutable();
+    }
+    
     private RadixNode? SearchRecursive(RadixNode node, string key, int depth, bool exactMatch)
     {
         if (depth == key.Length)
@@ -184,7 +201,7 @@ public sealed class RadixTree<T> where T : class
 
         return SearchRecursive(childNode, key, depth + edgeLabel.Length, exactMatch);
     }
-
+    
     public List<T> GetAllValuesForPrefix(string prefix)
     {
         List<T> results = new();
@@ -207,6 +224,7 @@ public sealed class RadixTree<T> where T : class
 
     private void CollectValues(RadixNode node, List<T> results)
     {
+        
         if (node.isEndOfWord && node.value != null)
         {
             results.Add(node.value);
