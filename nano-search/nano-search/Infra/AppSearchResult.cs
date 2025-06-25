@@ -1,28 +1,19 @@
-﻿using System.Collections.Concurrent;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Windows;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Interop;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using Application = System.Windows.Application;
 
 namespace NanoSearch;
 
 public class AppSearchResult : INotifyPropertyChanged
 {
-    private static readonly ConcurrentDictionary<string, ImageSource> _iconCache = new();
-    private static readonly object _iconLoadLock = new();
+    private readonly IAppLauncher _explorerLauncher;
+    private readonly IIconLoader _iconLoader;
+    
     public string FileName { get; set; }
     public string FullPath { get; }
-    
     private ImageSource? _icon;
     public ImageSource? Icon
     {
@@ -35,136 +26,28 @@ public class AppSearchResult : INotifyPropertyChanged
     }
     
     public ICommand OpenCommand { get; }
-
-    public AppSearchResult(string fullPath)
+    
+    public AppSearchResult(string fullPath, IAppLauncher explorerLauncher, IIconLoader iconLoader)
     {
         FullPath = fullPath;
-        FileName = System.IO.Path.GetFileName(fullPath);
+        FileName = Path.GetFileName(fullPath);
+        _explorerLauncher = explorerLauncher;
+        _iconLoader = iconLoader;
         OpenCommand = new RelayCommand(OpenInExplorer);
         _ = LoadIconAsync();
     }
 
     private void OpenInExplorer()
     {
-        if (File.Exists(FullPath))
-        {
-            Process.Start("explorer.exe", $"/select,\"{FullPath}\"");
-        }
+        _explorerLauncher.Launch(FullPath);
     }
 
-    public async Task LoadIconAsync()
+    private async Task LoadIconAsync()
     {
-        if (Icon != null) 
-            return;
-        
-       
-        if (_iconCache.TryGetValue(FullPath, out var cachedIcon))
-        {
-            Icon = cachedIcon;
-            return;
-        }
-
-        try
-        {
-            // Get icon on background thread
-            var iconHandle = await Task.Run(() => 
-            {
-                try
-                {
-                    var pathBuilder = new StringBuilder(FullPath, 260);
-                    ushort iconIndex = 0;
-                    IntPtr hIcon = ExtractAssociatedIconA(IntPtr.Zero, pathBuilder, ref iconIndex);
-                    return hIcon;
-                }
-                catch
-                {
-                    return IntPtr.Zero;
-                }
-            });
-
-            if (iconHandle == IntPtr.Zero)
-            {
-                Icon = DefaultIcon;
-                return;
-            }
-
-            // Create BitmapSource on UI thread
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                lock (_iconLoadLock)
-                {
-                    if (_iconCache.TryGetValue(FullPath, out var existingIcon))
-                    {
-                        Icon = existingIcon;
-                        return;
-                    }
-
-                    var bitmapSource = Imaging.CreateBitmapSourceFromHIcon(
-                        iconHandle,
-                        Int32Rect.Empty,
-                        BitmapSizeOptions.FromEmptyOptions());
-
-                    // Clean up icon handle
-                    DestroyIcon(iconHandle);
-
-                    bitmapSource.Freeze(); // Make cross-thread safe
-                    _iconCache.TryAdd(FullPath, bitmapSource);
-                    Icon = bitmapSource;
-                }
-            });
-        }
-        catch (Exception ex)
-        {
-            // Log or handle the exception as needed
-            Console.WriteLine($"Error loading icon for {FullPath}: {ex.Message}");
-            Icon = DefaultIcon; // Set to null if icon loading fails
-        }
+       Icon = await _iconLoader.LoadIconAsync(FullPath);
     }
-    // Add to AppSearchResult class
-
-    private static readonly ImageSource DefaultIcon = LoadDefaultShellIcon();
-
-    private static ImageSource LoadDefaultShellIcon()
-    {
-        // 0 is usually the standard document icon, 2 is the application icon
-        IntPtr hIcon = ExtractIcon(IntPtr.Zero, "shell32.dll", 2);
-        if (hIcon == IntPtr.Zero)
-            return null!;
-
-        var bitmapSource = Imaging.CreateBitmapSourceFromHIcon(
-            hIcon,
-            Int32Rect.Empty,
-            BitmapSizeOptions.FromEmptyOptions());
-
-        DestroyIcon(hIcon);
-        bitmapSource.Freeze();
-        return bitmapSource;
-    }
-    [DllImport("user32.dll", CharSet = CharSet.Auto)]
-    private static extern bool DestroyIcon(IntPtr handle);
-    
-    [DllImport("shell32.dll", CharSet = CharSet.Ansi)]
-    private static extern IntPtr ExtractAssociatedIconA(IntPtr hInst, StringBuilder pszIconPath, ref ushort piIcon);
-    
-    [DllImport("shell32.dll", CharSet = CharSet.Ansi)]
-    private static extern IntPtr ExtractIcon(IntPtr hInst, string lpszExeFileName, int nIconIndex);
     
     public event PropertyChangedEventHandler? PropertyChanged;
     protected void OnPropertyChanged([CallerMemberName] string? property = null)
         => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
-}
-
-public class ZeroToVisibilityConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        if (value is int count && count == 0)
-            return Visibility.Visible;
-        return Visibility.Collapsed;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
 }

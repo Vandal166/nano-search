@@ -21,6 +21,10 @@
       <None Update="resources\nano-search.ico">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Remove="Resources\explorer-icon.ico" />
+      <Resource Include="Resources\explorer-icon.ico" />
+      <None Remove="Resources\explorer-icon-light.ico" />
+      <Resource Include="Resources\explorer-icon-light.ico" />
     </ItemGroup>
 
 </Project>

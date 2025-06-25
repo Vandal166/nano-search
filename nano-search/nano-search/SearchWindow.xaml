@@ -61,138 +61,131 @@
 
 
         <!--  Search Results  -->
-        <ScrollViewer
+        <ListBox
+            Background="Transparent"
+            BorderThickness="0"
             Grid.Row="1"
-            Margin="0,10,0,0"
-            VerticalScrollBarVisibility="Auto">
+            Margin="0"
+            MouseLeftButtonUp="SearchResultsPanel_OnMouseLeftButtonUp"
+            Padding="0"
+            ScrollViewer.CanContentScroll="False"
+            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            VirtualizingStackPanel.IsVirtualizing="True"
+            VirtualizingStackPanel.VirtualizationMode="Recycling"
+            x:Name="SearchResultsPanel">
 
-            <ListBox
-                Background="Transparent"
-                BorderThickness="0"
-                Margin="0"
-                Padding="0"
-                ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                x:Name="SearchResultsPanel">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
 
-                <!--  Container style to handle hover on the whole item  -->
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Padding" Value="0" />
-                        <Setter Property="Margin" Value="2" />
-                        <Setter Property="Cursor" Value="Hand" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <Border
-                                        Background="#22FFFFFF"
-                                        CornerRadius="8"
-                                        Padding="6"
-                                        x:Name="Bd">
+            <!--  Container style to handle hover on the whole item  -->
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                    <Setter Property="Padding" Value="0" />
+                    <Setter Property="Margin" Value="2" />
+                    <Setter Property="Cursor" Value="Hand" />
 
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListBoxItem">
+                                <Border
+                                    Background="#22FFFFFF"
+                                    CornerRadius="8"
+                                    Padding="6"
+                                    x:Name="Bd">
 
-                                            <!--  ContentPresenter will host our DataTemplate  -->
-                                            <ContentPresenter VerticalAlignment="Center" />
-                                        </Grid>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" TargetName="Bd" Value="#44FFFFFF" />
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                <!--  DataTemplate for each item  -->
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                                        <!--  ContentPresenter will host our DataTemplate  -->
+                                        <ContentPresenter VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" TargetName="Bd" Value="#44FFFFFF" />
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" TargetName="Bd" Value="#44FFFFFF" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
 
-                            <!--  App Icon  -->
+            <!--  DataTemplate for each item  -->
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <!--  App Icon  -->
+                        <Image
+                            Height="28"
+                            Margin="0,0,10,0"
+                            Source="{Binding Icon}"
+                            VerticalAlignment="Center"
+                            Width="28" />
+
+                        <!--  Text of app name and path  -->
+                        <TextBlock
+                            FontSize="18"
+                            Foreground="White"
+                            Grid.Column="1"
+                            MaxWidth="200"
+                            Text="{Binding FileName}"
+                            TextTrimming="CharacterEllipsis"
+                            VerticalAlignment="Center" />
+
+                        <!--  Light-greyed out path  -->
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="#44FFFFFF"
+                            Grid.Column="2"
+                            HorizontalAlignment="Left"
+                            Margin="8,0,0,0"
+                            MaxWidth="450"
+                            Text="{Binding FullPath}"
+                            TextTrimming="CharacterEllipsis"
+                            VerticalAlignment="Center" />
+
+                        <!--  Open in Explorer button  -->
+                        <Button
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Command="{Binding OpenCommand}"
+                            CommandParameter="{Binding Path=FullPath}"
+                            Grid.Column="3"
+                            Height="42"
+                            Margin="8,0,20,0"
+                            Padding="0"
+                            ToolTip="Open in Explorer"
+                            VerticalAlignment="Center"
+                            Width="42">
                             <Image
-                                Height="28"
-                                Margin="0,0,10,0"
-                                Source="{Binding Icon}"
+                                Height="48"
+                                HorizontalAlignment="Center"
+                                Source="{StaticResource ExplorerIcon}"
+                                Stretch="Uniform"
                                 VerticalAlignment="Center"
-                                Width="28" />
-
-                            <!--  Text of app name and path  -->
-                            <TextBlock
-                                FontSize="18"
-                                Foreground="White"
-                                Grid.Column="1"
-                                Text="{Binding FileName}"
-                                TextTrimming="CharacterEllipsis"
-                                VerticalAlignment="Center" />
-
-                            <!--  TODO: show light-greyed out path  -->
-
-                            <!--  Open in Explorer button  -->
-                            <Button
-                                Background="Transparent"
-                                Command="{Binding OpenCommand}"
-                                CommandParameter="{Binding Path=FullPath}"
-                                Grid.Column="2"
-                                Height="36"
-                                Margin="8,0,20,0"
-                                ToolTip="Open in Explorer"
-                                VerticalAlignment="Center"
-                                Width="36">
-                                <Path
-                                    Data="M3,3 L21,3 L21,21 L3,21 Z M7,7 L17,7 L17,17 L7,17 Z"
-                                    Fill="Transparent"
-                                    IsHitTestVisible="False"
-                                    Stretch="Uniform" />
-                            </Button>
-                            <!--TODO <Button
-                                Background="Transparent"
-                                Command="{Binding OpenCommand}"
-                                CommandParameter="{Binding Path=FullPath}"
-                                Grid.Column="2"
-                                Height="36"
-                                Margin="8,0,20,0"
-                                ToolTip="Open in Explorer"
-                                VerticalAlignment="Center"
-                                Width="36">
-                                <Grid>
-                                    <Image
-                                        Height="20"
-                                        Source="{Binding ExplorerIconSource}"
-                                        Width="20" />
-                                    <Path
-                                        Data="M3,3 L21,3 L21,21 L3,21 Z M7,7 L17,7 L17,17 L7,17 Z"
-                                        Fill="Transparent"
-                                        IsHitTestVisible="False" />
-                                </Grid>
-                            </Button>-->
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-
-                <!--  Design‑time example items  -->
-                <!--<system:String>Notepad.exe — C:\Windows\System32</system:String>
-                <system:String>Calculator.exe — C:\Windows\System32</system:String>
-                <system:String>msedge.exe — C:\Program Files (x86)\Microsoft\Edge\Application</system:String>
-                <system:String>VisualStudio.exe — D:\Apps\VS2022\Common7\IDE</system:String>
-                <system:String>PowerToys.exe — C:\Program Files\PowerToys</system:String>
-                <system:String>Discord.exe — C:\Users\User\AppData\Local\Discord</system:String>
-                <system:String>Spotify.exe — C:\Users\User\AppData\Roaming\Spotify</system:String>
-                <system:String>File Explorer — C:\Windows\explorer.exe</system:String>
-                <system:String>Settings — C:\Windows\System32\control.exe</system:String>
-                <system:String>Command Prompt — C:\Windows\System32\cmd.exe</system:String>-->
-            </ListBox>
-        </ScrollViewer>
+                                Width="48" />
+                        </Button>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
     </Grid>
 </ui:FluentWindow>

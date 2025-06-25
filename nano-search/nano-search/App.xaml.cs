@@ -1,7 +1,4 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
-using System.Windows.Forms;
+﻿using System.Windows;
 using NanoSearch.Algorithms.Indexer;
 using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
@@ -16,10 +13,32 @@ public partial class App : Application
 {
     private NotifyIcon? _trayIcon;
     private SearchWindow _searchWindow { get; set; }
-
+    private SettingsWindow _settingsWindow;
+    
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        
+        var indexingOptions = new IndexingOptions();
+        var configService = new JsonConfigService("indexing_options.json", indexingOptions);
+        configService.Load();
+        
+        var fileIndexer = new FileIndexer();
+        FilterPipeline pipeline = FilterPipelineBuilder.Build(configService.IndexingOptions);
+        fileIndexer.IndexFileSystem(IndexingOptions.DiskRootPath, pipeline);
+        
+        
+        var _appLauncher = new AppLauncher();
+        var _navigation = new ListBoxNavigationService(_appLauncher);
+        
+        _searchWindow = new SearchWindow(
+            new SearchService(fileIndexer.RadixTree, 
+                new ExplorerLauncher(), 
+                new IconLoader()), 
+            _appLauncher, _navigation);
+        _searchWindow.Show();
+
+        _settingsWindow = new SettingsWindow(indexingOptions, configService);
         
         _trayIcon = new NotifyIcon
         {
@@ -30,52 +49,26 @@ public partial class App : Application
         
         _trayIcon.MouseClick += TrayIcon_MouseClick; // on click
         _trayIcon.DoubleClick += TrayIcon_DoubleClick; // on double click
-        
-        
-        var indexingOptions = new IndexingOptions();
-        
-        var configService = new JsonConfigService("indexing_options.json", indexingOptions);
-        configService.Load();
-        var fileIndexer = new FileIndexer();
-        
-        FilterPipeline pipeline = FilterPipelineBuilder.Build(configService.IndexingOptions);
-        //AnsiConsole.Write(new Rule("[yellow bold underline]Indexing[/]").LeftJustified().NewLine());
-        /*AnsiConsole.Status()
-            .AutoRefresh(true)
-            .Spinner(Spinner.Known.Dots)
-            .Start("[yellow]Indexing file system...[/]", ctx =>
-            {
-                ctx.Spinner(Spinner.Known.Dots);
-                ctx.Status($"[bold blue]Starting file indexing on {IndexingOptions.DiskRootPath}[/]");
-                
-            });*/
-        fileIndexer.IndexFileSystem(IndexingOptions.DiskRootPath, pipeline);
-        
-        _searchWindow = new SearchWindow(fileIndexer);
-        _searchWindow.Show();
+
     }
 
     private void TrayIcon_DoubleClick(object? sender, EventArgs e)
     {
-        _searchWindow.Show();
+        _searchWindow.ShowAndFocus();
     }
 
     private void TrayIcon_MouseClick(object? sender, MouseEventArgs e)
     {
         if (e.Button == MouseButtons.Right)
         {
-            // Show context menu
-            // allow indexing
-            // exit
+            var cursor = System.Windows.Forms.Control.MousePosition;
+            _settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
+            _settingsWindow.Left = cursor.X - (_settingsWindow.Width / 2);
+            _settingsWindow.Top = cursor.Y - (_settingsWindow.Height);
+            _settingsWindow.Show();
+            _settingsWindow.Activate();
         }
     }
-    
-    private void ShowSearchUI() 
-    {
-        /*var window = new SearchWindow(); // TODO cache to save resources
-        window.Show();*/
-    }
-
     protected override void OnExit(ExitEventArgs e) 
     {
         _trayIcon?.Dispose();
