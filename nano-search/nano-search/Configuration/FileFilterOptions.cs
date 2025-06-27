@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.ComponentModel;
+using System.IO;
 using System.Text.Json.Serialization;
 
 namespace NanoSearch.Configuration.Indexing;
@@ -13,7 +14,7 @@ public sealed class FileFilterOptions
     public string RegexNamePattern { get; set; } = @"^[\p{L}][\p{L}\p{N}_.-]*$";
     
     [JsonInclude]
-    public HashSet<char> ExcludeBeginningWith { get; } = new HashSet<char>
+    public HashSet<char> ExcludeBeginningWith { get; set; } = new HashSet<char>
     {
         '.',
         '~',
@@ -26,7 +27,7 @@ public sealed class FileFilterOptions
  
     // File types to specifically include
     [JsonInclude]
-    public HashSet<string> IncludedFileExtensions { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    public HashSet<string> IncludedFileExtensions { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".exe",
         ".msi",

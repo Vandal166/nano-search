@@ -224,7 +224,6 @@ public sealed class RadixTree<T> where T : class
 
     private void CollectValues(RadixNode node, List<T> results)
     {
-        
         if (node.isEndOfWord && node.value != null)
         {
             results.Add(node.value);

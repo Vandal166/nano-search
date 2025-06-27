@@ -3,10 +3,9 @@ using System.IO;
 using NanoSearch.Algorithms.RadixTrie;
 
 namespace NanoSearch;
-public interface ISearchService
+public interface ISearchService : IFileCountProvider
 {
     IEnumerable<AppSearchResult> Search(string query);
-    ulong GetIndexedFilesCount();
 }
 
 public sealed class SearchService : ISearchService
@@ -14,7 +13,9 @@ public sealed class SearchService : ISearchService
     private readonly RadixTree<ImmutableHashSet<string>> _indexedFiles;
     private readonly IAppLauncher _explorerLauncher;
     private readonly IIconLoader _iconLoader;
-
+    public ulong Count => _indexedFiles.Count;
+    
+    
     public SearchService(RadixTree<ImmutableHashSet<string>> indexedFiles, IAppLauncher explorerLauncher, IIconLoader iconLoader)
     {
         _indexedFiles = indexedFiles;
@@ -44,6 +45,4 @@ public sealed class SearchService : ISearchService
             yield return new AppSearchResult(x.Path, _explorerLauncher, _iconLoader);
         }
     }
-
-    public ulong GetIndexedFilesCount() => _indexedFiles.Count;
 }

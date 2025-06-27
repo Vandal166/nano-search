@@ -8,18 +8,17 @@ namespace NanoSearch.Configuration;
 public class JsonConfigService : IConfigService
 {
     public IndexingOptions IndexingOptions { get; }
-    private readonly string _filePath;
+    private const string FILE_PATH = "indexing_options.json";
      
     
-    public JsonConfigService(string filePath, IndexingOptions indexingOptions)
+    public JsonConfigService(IndexingOptions indexingOptions)
     {
-        _filePath = filePath;
         IndexingOptions = indexingOptions;
-    }
+    }   
     
     public void Load()
     {
-        if (!File.Exists(_filePath))
+        if (!File.Exists(FILE_PATH))
         {
             //_notificationService.Post("[yellow]Configuration file not found. Using default settings.[/]");
             Save();
@@ -28,7 +27,8 @@ public class JsonConfigService : IConfigService
 
         try
         {
-            var json = File.ReadAllText(_filePath);
+            Console.WriteLine($"Reading from full path: {Path.GetFullPath(FILE_PATH)}");
+            var json = File.ReadAllText(FILE_PATH);
             var options = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true,
@@ -64,7 +64,7 @@ public class JsonConfigService : IConfigService
                 Converters = { new JsonStringEnumConverter() } // For enum serialization
             });
             
-            File.WriteAllText(_filePath, cfg);
+            File.WriteAllText(FILE_PATH, cfg);
         }
         catch (Exception ex)
         {

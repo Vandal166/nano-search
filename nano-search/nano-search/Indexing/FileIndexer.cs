@@ -8,24 +8,20 @@ using NanoSearch.Enumerators;
 
 namespace NanoSearch.Algorithms.Indexer;
 
-public sealed class FileIndexer
+public sealed class FileIndexer : IFileCountProvider
 {
     public RadixTree<ImmutableHashSet<string>> RadixTree { get; } = new RadixTree<ImmutableHashSet<string>>();
     private readonly ConcurrentDictionary<string, ImmutableHashSet<string>> _fileDictionary = new();
     private FilterPipeline _filterPipeline = null!;
+    public ulong Count => RadixTree.Count;
 
-
-    public void IndexFileSystem(string? rootPath, FilterPipeline filterPipeline)
+    public void IndexFileSystem(HashSet<string> rootPath, FilterPipeline filterPipeline)
     {
-        /*if (string.IsNullOrEmpty(rootPath))
-        {
-            _notification.Post("[red]Could not retrieve root path for indexing. Make sure the drive is mounted or the app has permissions to access it.[/]");
-            return;
-        }*/
-        
+        Console.WriteLine("indexing");
         if(RadixTree.Count > 0)
         {
             RadixTree.Clear();
+            _fileDictionary.Clear();
         }
         _filterPipeline = filterPipeline;
         var parallelOptions = new ParallelOptions
@@ -33,13 +29,16 @@ public sealed class FileIndexer
             MaxDegreeOfParallelism = Environment.ProcessorCount,
         };
 
-        List<string> directories = new List<string>();
-        using (var directoryEnumerator = new FastDirectoryEnumerator(rootPath, _filterPipeline.DirectoryFilter, _filterPipeline.DirectoryAttributesToSkip))
+        List<string> directories = new List<string>(50 * rootPath.Count); // preallocating space for directories depending on the number of root paths
+        foreach (var rootP in rootPath)
         {
-            while (directoryEnumerator.MoveNext())
+            using (var directoryEnumerator = new FastDirectoryEnumerator(rootP, _filterPipeline.DirectoryFilter, _filterPipeline.DirectoryAttributesToSkip))
             {
-                directories.Add(Path.Combine(rootPath, directoryEnumerator.Current)); // <rootPath, subDirName>
-                                                                                      // ex. <C:\, Program Files>
+                while (directoryEnumerator.MoveNext())
+                {
+                    directories.Add(Path.Combine(rootP, directoryEnumerator.Current)); // <rootPath, subDirName>
+                                                                                          // ex. <C:\, Program Files>
+                }
             }
         }
         
@@ -50,6 +49,7 @@ public sealed class FileIndexer
        //_notification.Post($"File indexing completed in {stopwatch.ElapsedMilliseconds} ms.");
         
         BuildRadixTree();
+        Console.WriteLine($"Indexed files - count :{Count}");
     }
     private void BuildRadixTree()
     {

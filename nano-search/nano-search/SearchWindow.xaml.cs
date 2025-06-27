@@ -27,7 +27,7 @@ public partial class SearchWindow : FluentWindow
         _appLauncher = appLauncher;
         _navigation = navigation;
 
-        Console.WriteLine($"Indexer loaded and indexed - count :{searchService.GetIndexedFilesCount()}");
+        Console.WriteLine($"Indexer loaded and indexed - count :{searchService.Count}");
         ApplicationThemeManager.Apply(
             ApplicationTheme.Dark,                // Light or Dark theme
             WindowBackdropType.Mica,             // Mica or Acrylic

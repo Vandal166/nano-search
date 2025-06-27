@@ -6,15 +6,14 @@ namespace NanoSearch;
 
 public class ListBoxNavigationService : INavigationService
 {
-    private readonly IAppLauncher _appLauncher;
+    private readonly Dictionary<Key, INavigationStrategy> _keyStrategiesMap;
     private ListBox? _listBox;
     private Window? _window;
     
-    public ListBoxNavigationService(IAppLauncher appLauncher)
+    public ListBoxNavigationService(IEnumerable<INavigationStrategy> strategies)
     {
-        _appLauncher = appLauncher;
+        _keyStrategiesMap = strategies.ToDictionary(s => s.ShortcutKey, s => s); // mapping <shortcut key, strategy>
     }
-
     public void Attach(ListBox listBox)
     {
         _listBox    = listBox;
@@ -34,33 +33,13 @@ public class ListBoxNavigationService : INavigationService
     private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
         // only when window is visible & the ListBox has items
-        if (_window == null || !_window.IsVisible) 
+        if (_window?.IsVisible == false || _listBox?.Items.Count == 0) 
             return;
 
-        if (_listBox == null || _listBox.Items.Count == 0)
-            return;
-
-        switch (e.Key)
+        if (_keyStrategiesMap.TryGetValue(e.Key, out var strat))
         {
-            case Key.Down:
-                _listBox.SelectedIndex = Math.Min(_listBox.Items.Count - 1,
-                    _listBox.SelectedIndex + 1);
-                _listBox.ScrollIntoView(_listBox.SelectedItem);
-                e.Handled = true;
-                break;
-
-            case Key.Up:
-                _listBox.SelectedIndex = Math.Max(0,
-                    _listBox.SelectedIndex - 1);
-                _listBox.ScrollIntoView(_listBox.SelectedItem);
-                e.Handled = true;
-                break;
-
-            case Key.Enter:
-                if (_listBox.SelectedItem is AppSearchResult item)
-                    _appLauncher.Launch(item.FullPath);
-                e.Handled = true;
-                break;
+            strat.Execute(_listBox);
+            e.Handled = true;
         }
     }
 }
