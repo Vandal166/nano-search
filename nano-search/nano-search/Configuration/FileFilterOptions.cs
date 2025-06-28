@@ -30,8 +30,6 @@ public sealed class FileFilterOptions
     public HashSet<string> IncludedFileExtensions { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         ".exe",
-        ".msi",
-        ".bat"
     };
     
     public void CopyFrom(FileFilterOptions? other)

@@ -86,7 +86,7 @@
 
             <!--  Show in tray  -->
             <CheckBox
-                Click="ShowInTray_Click"
+                Command="{Binding TrayToggledCommand}"
                 Content="Show in tray"
                 Foreground="White"
                 IsChecked="{Binding ShowInTrayOption.ShowInTray, Mode=TwoWay}"
@@ -110,7 +110,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <CheckBox
-                            Click="OnDriveChecked"
+                            Command="{Binding DataContext.DriveCheckedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                             Content="{Binding DriveLetter}"
                             Foreground="White"
                             IsChecked="{Binding Include, Mode=TwoWay}"
@@ -130,19 +130,19 @@
             <Separator BorderBrush="#777" Margin="2,4" />
             <!--  Actions  -->
             <Button
-                Click="IndexFiles_Click"
+                Command="{Binding IndexFilesCommand}"
                 Content="Reindex files"
                 HorizontalAlignment="Left"
                 Margin="14,4"
                 Padding="4" />
             <Button
-                Click="OnOpenFileOptions"
+                Command="{Binding OpenFileOptionsCommand}"
                 Content="File indexing options"
                 HorizontalAlignment="Left"
                 Margin="14,4"
                 Padding="4" />
             <Button
-                Click="OnOpenDirOptions"
+                Command="{Binding OpenDirOptionsCommand}"
                 Content="Directory indexing options"
                 HorizontalAlignment="Left"
                 Margin="14,4"
@@ -152,7 +152,7 @@
 
             <!--  Exit  -->
             <Button
-                Click="OnExit"
+                Command="{Binding ExitCommand}"
                 Content="Exit"
                 HorizontalAlignment="Left"
                 Margin="14,4"

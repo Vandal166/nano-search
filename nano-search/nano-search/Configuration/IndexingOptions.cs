@@ -10,7 +10,7 @@ namespace NanoSearch.Configuration.Indexing;
 public sealed class IndexingOptions
 {
     [JsonInclude]
-    public bool ShowInTray { get; set; } = true;
+    public bool ShowInTray { get; set; } = true; //TODO move this smwhere else as this is not an indexing option
     
     [JsonInclude]
     public HashSet<string> DrivesToIndex { get; set; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase)

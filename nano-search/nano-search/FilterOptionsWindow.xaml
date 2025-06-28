@@ -12,7 +12,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Window.Resources>
-        <nanoSearch:EnumFlagMultiConverter x:Key="EnumFlagMultiConverter" />
 
         <!--  All FileAttributes values for flags  -->
         <ObjectDataProvider
@@ -42,19 +41,12 @@
 
         <TabControl Grid.Row="1">
             <!--  1) Attributes To Skip  -->
-            <TabItem Header="Attributes">
+            <TabItem Header="Attributes to skip">
                 <ScrollViewer>
-                    <ItemsControl ItemsSource="{Binding Source={StaticResource FileAttributesValues}}">
+                    <ItemsControl ItemsSource="{Binding FileAttributeFlags}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox Content="{Binding}">
-                                    <CheckBox.IsChecked>
-                                        <MultiBinding Converter="{StaticResource EnumFlagMultiConverter}" Mode="OneWay">
-                                            <Binding Path="DataContext.AttributesToSkip" RelativeSource="{RelativeSource AncestorType=Window}" />
-                                            <Binding />
-                                        </MultiBinding>
-                                    </CheckBox.IsChecked>
-                                </CheckBox>
+                                <CheckBox Content="{Binding Name}" IsChecked="{Binding IsChecked, Mode=TwoWay}" />
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -62,23 +54,25 @@
             </TabItem>
 
             <!--  2) Excluded Leading Chars  -->
-            <TabItem Header="Leading Chars">
+            <TabItem Header="Skipped Leading Chars">
                 <StackPanel>
                     <ListBox
                         Height="100"
                         ItemsSource="{Binding ExcludeBeginningWith}"
+                        SelectedItem="{Binding SelectedExcludedChar, Mode=TwoWay}"
                         x:Name="ExcludedCharsList" />
                     <WrapPanel Margin="0,4">
                         <TextBox
                             MaxLength="1"
-                            Width="30"
+                            Text="{Binding NewChar, UpdateSourceTrigger=PropertyChanged}"
+                            Width="40"
                             x:Name="NewCharBox" />
                         <Button
-                            Click="OnAddExcludeChar"
+                            Command="{Binding AddExcludedCharCommand}"
                             Content="Add"
                             Margin="4,0" />
                         <Button
-                            Click="OnRemoveExcludeChar"
+                            Command="{Binding RemoveExcludedCharCommand}"
                             Content="Remove"
                             Margin="4,0" />
                     </WrapPanel>
@@ -86,20 +80,24 @@
             </TabItem>
 
             <!--  3) Included Extensions  -->
-            <TabItem Header="Extensions">
+            <TabItem Header="Included Extensions">
                 <StackPanel>
                     <ListBox
                         Height="100"
                         ItemsSource="{Binding IncludedFileExtensions}"
+                        SelectedItem="{Binding SelectedExtension, Mode=TwoWay}"
                         x:Name="ExtensionsList" />
                     <WrapPanel Margin="0,4">
-                        <TextBox Width="100" x:Name="NewExtBox" />
+                        <TextBox
+                            Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}"
+                            Width="100"
+                            x:Name="NewExtBox" />
                         <Button
-                            Click="OnAddExtension"
+                            Command="{Binding AddExtensionCommand}"
                             Content="Add"
                             Margin="4,0" />
                         <Button
-                            Click="OnRemoveExtension"
+                            Command="{Binding RemoveExtensionCommand}"
                             Content="Remove"
                             Margin="4,0" />
                     </WrapPanel>
@@ -108,21 +106,33 @@
         </TabControl>
 
         <!--  OK / Cancel  -->
-        <StackPanel
-            Grid.Row="2"
-            HorizontalAlignment="Right"
-            Margin="0,8,0,0"
-            Orientation="Horizontal">
+        <Grid Grid.Row="2" Margin="0,8,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <Button
-                Click="OnOk"
-                Content="OK"
-                Margin="4,0"
-                Width="75" />
-            <Button
-                Click="OnCancel"
-                Content="Cancel"
-                Margin="4,0"
-                Width="75" />
-        </StackPanel>
+                Command="{Binding ResetToDefaultCommand}"
+                Content="Reset to default"
+                Grid.Column="0"
+                HorizontalAlignment="Left"
+                Margin="0,0,4,0"
+                Width="120" />
+            <StackPanel
+                Grid.Column="1"
+                HorizontalAlignment="Right"
+                Orientation="Horizontal">
+                <Button
+                    Click="OnOk"
+                    Content="OK"
+                    Margin="4,0"
+                    Width="75" />
+                <Button
+                    Click="OnCancel"
+                    Content="Cancel"
+                    Margin="4,0"
+                    Width="75" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </Window>

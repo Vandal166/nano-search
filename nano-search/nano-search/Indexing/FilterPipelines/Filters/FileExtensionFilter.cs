@@ -13,9 +13,6 @@ public class FileExtensionFilter : IFileSystemEntry
 
     public bool ShouldSkip(ref FileSystemEntry entry)
     {
-        if (_includedExtensions.Count == 0) 
-            return false;
-        
         ReadOnlySpan<char> fileName = entry.FileName;
         int lastDot = fileName.LastIndexOf('.');
         if (lastDot < 0)

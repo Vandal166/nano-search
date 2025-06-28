@@ -99,23 +99,33 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ExplorerLauncher>();
         services.AddSingleton<LinkLauncher>();
         
-        services.AddSingleton<SettingsWindow>(provider  =>  
+        services.AddSingleton<IDialogService, DialogService>();
+        services.AddTransient<FileFilterOptions>(provider =>
+            provider.GetRequiredService<IndexingOptions>().FileFilter);
+        services.AddTransient<FilterOptionsViewModel>();
+        services.AddTransient<FilterOptionsWindow>();   // XAML window
+        
+        services.AddSingleton<SettingsViewModel>(provider =>
         {
+            var dialogService = provider.GetRequiredService<IDialogService>();
             var options = provider.GetRequiredService<IndexingOptions>();
             var configService = provider.GetRequiredService<JsonConfigService>();
             var fileIndexer = provider.GetRequiredService<FileIndexer>();
-            return new SettingsWindow(
-                options,
-                configService,
-                fileIndexer,
-                () =>
-                {
-                    var pipeline = FilterPipelineBuilder.Build(configService.IndexingOptions);
-                    fileIndexer.IndexFileSystem(options.DrivesToIndex, pipeline);
-                }
-            );
+            Action onOptionsChanged = () =>
+            {
+                var pipeline = FilterPipelineBuilder.Build(configService.IndexingOptions);
+                fileIndexer.IndexFileSystem(options.DrivesToIndex, pipeline);
+            };
+            return new SettingsViewModel(dialogService, options, configService, fileIndexer, onOptionsChanged);
         });
         
+        services.AddSingleton<SettingsWindow>(provider =>
+        {
+            var vm = provider.GetRequiredService<SettingsViewModel>();
+            return new SettingsWindow(vm);
+        });
+        
+
         services.AddSingleton<ISearchService>(provider =>
         {
             var fileIndexer = provider.GetRequiredService<FileIndexer>();
