@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nano-search", "nano-search\nano-search.csproj", "{7092C1A9-CDA5-48EB-9C30-D4089AC10772}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "nano-search", "nano-search.csproj", "{7092C1A9-CDA5-48EB-9C30-D4089AC10772}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
