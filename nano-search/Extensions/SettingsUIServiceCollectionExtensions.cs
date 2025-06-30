@@ -15,8 +15,12 @@ public static class SettingsUIServiceCollectionExtensions
         services.AddSingleton<IDialogService, DialogService>();
 
         // Filter options dialogs
+        services.AddTransient<KeybindingsOptionsViewModel>();
+        services.AddTransient<KeybindingsOptionsWindow>();
+        
         services.AddTransient<FileFilterOptionsViewModel>();
         services.AddTransient<FileFilterOptionsWindow>();
+        
         services.AddTransient<DirectoryFilterOptionsViewModel>();
         services.AddTransient<DirectoryFilterOptionsWindow>();
 
@@ -24,15 +28,16 @@ public static class SettingsUIServiceCollectionExtensions
         services.AddSingleton<SettingsViewModel>(provider =>
         {
             var dialogService = provider.GetRequiredService<IDialogService>();
-            var options = provider.GetRequiredService<IndexingOptions>();
-            var configService = provider.GetRequiredService<JsonConfigService>();
+            /*var options = provider.GetRequiredService<IndexingOptions>();*/
+            var indexingConfigService = provider.GetRequiredService<IConfigService<IndexingOptions>>();
+            var keybindingsConfigService = provider.GetRequiredService<IConfigService<KeybindingsOptions>>();
             var fileIndexer = provider.GetRequiredService<FileIndexer>();
             Action onOptionsChanged = () =>
             {
-                var pipeline = FilterPipelineBuilder.Build(configService.IndexingOptions);
-                fileIndexer.IndexFileSystem(options.DrivesToIndex, pipeline);
+                var pipeline = FilterPipelineBuilder.Build(indexingConfigService.Options);
+                fileIndexer.IndexFileSystem(indexingConfigService.Options.DrivesToIndex, pipeline);
             };
-            return new SettingsViewModel(dialogService, options, configService, fileIndexer, onOptionsChanged);
+            return new SettingsViewModel(dialogService, indexingConfigService, keybindingsConfigService, fileIndexer, onOptionsChanged);
         });
         services.AddSingleton<SettingsWindow>();
 

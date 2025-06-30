@@ -1,7 +1,9 @@
 ﻿using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
+using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
 using NanoSearch.Configuration.Services;
+using NanoSearch.Navigation.Hotkey;
 using NanoSearch.UI.Windows;
 using Application = System.Windows.Application;
 
@@ -22,15 +24,14 @@ public partial class App : Application
             .AddLaunchers()
             .AddSearchUI()
             .AddSettingsUI()
-            .AddNavigation();;
+            .AddNavigation();
         
         _serviceProvider = services.BuildServiceProvider();
         
         var searchWindow = _serviceProvider.GetRequiredService<SearchWindow>();
-        _serviceProvider.GetRequiredService<SettingsWindow>();
         
         // if Show in Tray is true in the cfg then load the tray icon
-        if (_serviceProvider.GetRequiredService<IndexingOptions>().ShowInTray)
+        if (_serviceProvider.GetRequiredService<IConfigService<IndexingOptions>>().Options.ShowInTray)
         {
             _trayIcon = new NotifyIcon
             {
@@ -44,6 +45,7 @@ public partial class App : Application
         }
 
         searchWindow.Show();
+        _serviceProvider.GetRequiredService<IHotKeyService>();
     }
 
     private void TrayIcon_DoubleClick(object? sender, EventArgs e)

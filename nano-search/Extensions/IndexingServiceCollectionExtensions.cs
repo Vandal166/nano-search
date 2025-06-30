@@ -8,31 +8,29 @@ public static class IndexingServiceCollectionExtensions
 {
     public static IServiceCollection AddIndexing(this IServiceCollection services)
     {
-        services.AddSingleton<IndexingOptions>();
-        services.AddSingleton<JsonConfigService>(provider =>
-        {
-            var options = provider.GetRequiredService<IndexingOptions>();
-            var config = new JsonConfigService(options);
-            config.Load();
-            return config;
-        });
+        /*services.AddSingleton<IndexingOptions>();*/
+        services.AddSingleton<IConfigService<IndexingOptions>>(
+            _ => new JsonConfigService<IndexingOptions>("indexing_options.json"));
+
+        services.AddSingleton<IConfigService<KeybindingsOptions>>(
+            _ => new JsonConfigService<KeybindingsOptions>("keybindings.json"));
         
         services.AddSingleton<FilterPipeline>(sp =>
-            FilterPipelineBuilder.Build(sp.GetRequiredService<JsonConfigService>().IndexingOptions)
+            FilterPipelineBuilder.Build(sp.GetRequiredService<IConfigService<IndexingOptions>>().Options)
         );
         
         services.AddSingleton<FileIndexer>(sp => 
         {
             var idx = new FileIndexer();
-            var opts = sp.GetRequiredService<IndexingOptions>();
+            var opts = sp.GetRequiredService<IConfigService<IndexingOptions>>().Options;
             idx.IndexFileSystem(opts.DrivesToIndex, sp.GetRequiredService<FilterPipeline>());
             return idx;
         });
         
         services.AddTransient<FileFilterOptions>(provider =>
-            provider.GetRequiredService<IndexingOptions>().FileFilter);
+            provider.GetRequiredService<IConfigService<IndexingOptions>>().Options.FileFilter);
         services.AddTransient<DirectoryFilterOptions>(provider =>
-            provider.GetRequiredService<IndexingOptions>().DirectoryFilter);
+            provider.GetRequiredService<IConfigService<IndexingOptions>>().Options.DirectoryFilter);
         
         return services;
     }

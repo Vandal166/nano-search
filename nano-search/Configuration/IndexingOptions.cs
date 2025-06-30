@@ -22,8 +22,8 @@ public sealed class IndexingOptions
     };
     
     
-    public FileFilterOptions      FileFilter   { get; init; } = new();
-    public DirectoryFilterOptions DirectoryFilter    { get; init; } = new();
+    public FileFilterOptions      FileFilter   { get; set; } = new();
+    public DirectoryFilterOptions DirectoryFilter    { get; set; } = new();
     
     public void CopyFrom(IndexingOptions? other)
     {

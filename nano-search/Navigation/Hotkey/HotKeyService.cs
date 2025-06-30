@@ -10,30 +10,35 @@ public sealed class HotKeyService : IHotKeyService
     private int _nextId = 1;
     
     private readonly HwndSource _visual;
-    private readonly Dictionary<int, Action> _actions = new Dictionary<int, Action>();
+    private readonly Dictionary<int, IHotKeyAction> _actions = new Dictionary<int, IHotKeyAction>();
     
-    public HotKeyService(Window window)
+    public HotKeyService(Window w, IEnumerable<IHotKeyAction> handlers)
     {
-        var helper = new WindowInteropHelper(window);
-        _visual = HwndSource.FromHwnd(helper.Handle) ?? throw new InvalidOperationException("Could not get HwndSource");
+        _visual = HwndSource.FromHwnd(new WindowInteropHelper(w).Handle)
+                  ?? throw new InvalidOperationException();
+
         _visual.AddHook(WndProc);
+
+        foreach (var h in handlers)
+        {
+            RegisterGlobal(h.Modifiers, h.Key, h);
+        }
     }
-    public void RegisterGlobal(KeyModifiers mods, Keys key, Action callback)
+    public void RegisterGlobal(KeyModifiers mods, Keys key, IHotKeyAction callback)
     {
         var id = _nextId++;
         var handle = _visual.Handle;
         if (!RegisterHotKey(handle, id, (int)mods, (int)key))
-        {
-            throw new InvalidOperationException("Failed to register hotkey.");
-        }
+            throw new InvalidOperationException($"Failed to register hotkey {mods} + {key}");
         _actions[id] = callback;
+        Console.WriteLine($"Registered hotkey: {mods} + {key} with ID {id}");
     }
     
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
         if (msg == WM_HOTKEY && _actions.TryGetValue(wParam.ToInt32(), out var action))
         {
-            action();
+            action.Execute();
             handled = true;
         }
 

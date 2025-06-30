@@ -6,7 +6,7 @@ namespace NanoSearch.Search.Strategies;
 public class ExactSearchStrategy : ISearchStrategy
 {
     public ImmutableHashSet<string>? Search(RadixTree<ImmutableHashSet<string>> tree, string query)
-        => tree.SearchExact(query); //TODO also .Take(MAX_RESULTS) here or inside RadixTree to limit results CONFIGURABLE via conf opts
+        => tree.SearchExact(query);
 
     public  bool CanHandle(string query)
     {

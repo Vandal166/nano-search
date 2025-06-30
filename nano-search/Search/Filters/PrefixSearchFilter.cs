@@ -6,7 +6,7 @@ public class PrefixSearchFilter : ISearchFilter
 {
     public ImmutableHashSet<string>? Apply(ImmutableHashSet<string>? rawResults, string query)
     {
-        return rawResults?.Take(50) // TODO configurable via options
+        return rawResults?.Take(50)
             .ToImmutableHashSet();
     }
 }

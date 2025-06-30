@@ -16,8 +16,6 @@ public static class SearchStrategyFactory
     }
     public static ISearchStrategy? GetStrategy(string query)
     {
-        //TODO get from Indexing config
-        
         return _listOfSearchStrategies.FirstOrDefault(x => x.CanHandle(query));
     }
     

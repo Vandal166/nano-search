@@ -28,4 +28,12 @@
       <Resource Include="Resources\explorer-icon-light.ico" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Page Update="UI\Windows\KeybindingsOptionsWindow.xaml">
+        <Generator>MSBuild:Compile</Generator>
+        <XamlRuntime>Wpf</XamlRuntime>
+        <SubType>Designer</SubType>
+      </Page>
+    </ItemGroup>
+
 </Project>

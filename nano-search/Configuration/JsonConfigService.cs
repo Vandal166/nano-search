@@ -5,24 +5,39 @@ using NanoSearch.Configuration.Indexing;
 
 namespace NanoSearch.Configuration;
 
-public class JsonConfigService : IConfigService
+public class JsonConfigService<T> : IConfigService<T> where T : new()
 {
-    public IndexingOptions IndexingOptions { get; }
-    /*C:\Users\username\AppData\Roaming\NanoSearch\indexing_options.json*/
-    private readonly string FILE_PATH = Path.Combine(
+    public T Options { get; }
+    /*C:\Users\username\AppData\Roaming\NanoSearch\cfg.json*/
+    private readonly string _filePath; /*= Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
         "NanoSearch",
         "indexing_options.json"
-    );  
-    
-    public JsonConfigService(IndexingOptions indexingOptions)
+    );  */
+    private readonly JsonSerializerOptions _serializerOptions;
+
+    /*public JsonConfigService(IndexingOptions indexingOptions)
     {
         IndexingOptions = indexingOptions;
-    }   
-    
+    }   */
+    public JsonConfigService(string fileName)
+    {
+        Options = new T();
+        _filePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "NanoSearch", fileName);
+        _serializerOptions = new JsonSerializerOptions
+        {
+            WriteIndented            = true,
+            PropertyNamingPolicy     = JsonNamingPolicy.SnakeCaseUpper,
+            Converters               = { new JsonStringEnumConverter() },
+            PropertyNameCaseInsensitive = true
+        };
+        Load();
+    }
     public void Load()
     {
-        if (!File.Exists(FILE_PATH))
+        if (!File.Exists(_filePath))
         {
             Save();
             return;
@@ -30,19 +45,15 @@ public class JsonConfigService : IConfigService
 
         try
         {
-            Console.WriteLine($"Reading from full path: {Path.GetFullPath(FILE_PATH)}");
-            var json = File.ReadAllText(FILE_PATH);
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy        = JsonNamingPolicy.SnakeCaseUpper,
-                Converters                  = { new JsonStringEnumConverter() }
-            };
-            var loadedOptions = JsonSerializer.Deserialize<IndexingOptions>(json, options);
+            Console.WriteLine($"Reading from full path: {Path.GetFullPath(_filePath)}");
+            var json = File.ReadAllText(_filePath);
+            
+            var loadedOptions = JsonSerializer.Deserialize<T>(json, _serializerOptions);
             
             if (loadedOptions != null)
             {
-                IndexingOptions.CopyFrom(loadedOptions);
+                Copy(loadedOptions, Options);
+                /*IndexingOptions.CopyFrom(loadedOptions);*/
             }
         }
         catch (Exception ex){/*noop*/}
@@ -52,16 +63,19 @@ public class JsonConfigService : IConfigService
     {
         try
         {
-            var cfg = JsonSerializer.Serialize(IndexingOptions, new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseUpper,
-                Converters = { new JsonStringEnumConverter() } // For enum serialization
-            });
+            var cfg = JsonSerializer.Serialize(Options, _serializerOptions);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(FILE_PATH)!);
-            File.WriteAllText(FILE_PATH, cfg);
+            Directory.CreateDirectory(Path.GetDirectoryName(_filePath)!);
+            File.WriteAllText(_filePath, cfg);
         }
         catch (Exception ex){/*noop*/}
+    }
+    
+    private static void Copy(T from, T to)
+    {
+        foreach (var prop in typeof(T).GetProperties().Where(p => p.CanRead && p.CanWrite))
+        {
+            prop.SetValue(to, prop.GetValue(from));
+        }
     }
 }

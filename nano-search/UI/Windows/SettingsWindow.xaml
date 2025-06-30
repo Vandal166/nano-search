@@ -2,7 +2,7 @@
 <Window
     AllowsTransparency="True"
     Background="Transparent"
-    Height="400"
+    Height="360"
     Padding="0"
     ResizeMode="NoResize"
     ShowInTaskbar="False"
@@ -55,116 +55,130 @@
             Background="#DD1E1E1E"
             CornerRadius="0"
             Padding="0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
 
-            <StackPanel>
-                <!--  Header  -->
-                <TextBlock
-                    FontSize="14"
-                    FontWeight="SemiBold"
-                    Foreground="White"
-                    Margin="4,4,4,0"
-                    Text="nano-search" />
-
-                <!--  Links  -->
-                <StackPanel Margin="0,0,4,2" Orientation="Horizontal">
-                    <ui:HyperlinkButton
-                        Content="Site"
-                        Cursor="Hand"
-                        NavigateUri="https://github.com/Vandal166/nano-search"
-                        Padding="4,0,4,0" />
+                <StackPanel>
+                    <!--  Header  -->
                     <TextBlock
                         FontSize="14"
-                        Foreground="#66FFFFFF"
-                        Margin="0,0"
-                        Text=" | " />
-                    <ui:HyperlinkButton
-                        Content="License"
-                        Cursor="Hand"
-                        NavigateUri="https://github.com/Vandal166/nano-search/blob/main/LICENSE"
-                        Padding="4,0,0,0" />
+                        FontWeight="SemiBold"
+                        Foreground="White"
+                        Margin="4,4,4,0"
+                        Text="nano-search" />
+
+                    <!--  Links  -->
+                    <StackPanel Margin="0,0,4,2" Orientation="Horizontal">
+                        <ui:HyperlinkButton
+                            Content="Site"
+                            Cursor="Hand"
+                            NavigateUri="https://github.com/Vandal166/nano-search"
+                            Padding="4,0,4,0" />
+                        <TextBlock
+                            FontSize="14"
+                            Foreground="#66FFFFFF"
+                            Margin="0,0"
+                            Text=" | " />
+                        <ui:HyperlinkButton
+                            Content="License"
+                            Cursor="Hand"
+                            NavigateUri="https://github.com/Vandal166/nano-search/blob/main/LICENSE"
+                            Padding="4,0,0,0" />
+                    </StackPanel>
+
+                    <Separator BorderBrush="#777" Margin="2,4" />
+
+                    <!--  Show in tray  -->
+                    <CheckBox
+                        Command="{Binding TrayToggledCommand}"
+                        Content="Show in tray"
+                        Foreground="White"
+                        IsChecked="{Binding ShowInTrayOption.ShowInTray, Mode=TwoWay}"
+                        Margin="8,0"
+                        Padding="0" />
+
+                    <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
+                    <ContentPresenter x:Name="RootContentDialog" />
+                    <Separator BorderBrush="#777" Margin="2,4" />
+
+                    <!--  Drives  -->
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="White"
+                        Margin="4,2"
+                        Text="Disks to index:" />
+                    <ItemsControl ItemsSource="{Binding AllDrives}" Margin="4,0">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox
+                                    Command="{Binding DataContext.DriveCheckedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Content="{Binding DriveLetter}"
+                                    Foreground="White"
+                                    IsChecked="{Binding Include, Mode=TwoWay}"
+                                    Margin="0,2" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Separator BorderBrush="#777" Margin="2,4" />
+
+                    <TextBlock
+                        FontSize="12"
+                        Foreground="White"
+                        Margin="14,4,0,0"
+                        Text="{Binding IndexedFileCount.Count, StringFormat='Indexed files: {0}'}" />
+
+                    <Separator BorderBrush="#777" Margin="2,4" />
+                    <!--  Actions  -->
+                    <Button
+                        Command="{Binding IndexFilesCommand}"
+                        Content="Reindex files"
+                        HorizontalAlignment="Left"
+                        Margin="14,4"
+                        Padding="4" />
+                    <Expander
+                        Background="Transparent"
+                        Foreground="White"
+                        Header="Options"
+                        Margin="10,0,10,0">
+                        <StackPanel>
+                            <Button
+                                Command="{Binding OpenKeybindingsCommand}"
+                                Content="Edit Keybindings"
+                                HorizontalAlignment="Left"
+                                Margin="0,4"
+                                Padding="0" />
+                            <Button
+                                Command="{Binding OpenFileOptionsCommand}"
+                                Content="File indexing options"
+                                HorizontalAlignment="Left"
+                                Margin="0,4"
+                                Padding="0" />
+                            <Button
+                                Command="{Binding OpenDirOptionsCommand}"
+                                Content="Directory indexing options"
+                                HorizontalAlignment="Left"
+                                Margin="0,4"
+                                Padding="0" />
+                        </StackPanel>
+                    </Expander>
+                    <Separator BorderBrush="#777" Margin="2,4" />
+
+                    <!--  Exit  -->
+                    <Button
+                        Command="{Binding ExitCommand}"
+                        Content="Exit"
+                        HorizontalAlignment="Left"
+                        Margin="14,4"
+                        Padding="4" />
+
                 </StackPanel>
-
-                <Separator BorderBrush="#777" Margin="2,4" />
-
-                <!--  Show in tray  -->
-                <CheckBox
-                    Command="{Binding TrayToggledCommand}"
-                    Content="Show in tray"
-                    Foreground="White"
-                    IsChecked="{Binding ShowInTrayOption.ShowInTray, Mode=TwoWay}"
-                    Margin="8,0"
-                    Padding="0" />
-
-                <ui:SnackbarPresenter x:Name="SnackbarPresenter" />
-                <ContentPresenter x:Name="RootContentDialog" />
-                <Separator BorderBrush="#777" Margin="2,4" />
-
-                <!--  Drives  -->
-                <TextBlock
-                    FontSize="12"
-                    Foreground="White"
-                    Margin="4,2"
-                    Text="Disks to index:" />
-                <ItemsControl ItemsSource="{Binding AllDrives}" Margin="4,0">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Columns="3" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <CheckBox
-                                Command="{Binding DataContext.DriveCheckedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                Content="{Binding DriveLetter}"
-                                Foreground="White"
-                                IsChecked="{Binding Include, Mode=TwoWay}"
-                                Margin="0,2" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <Separator BorderBrush="#777" Margin="2,4" />
-
-                <TextBlock
-                    FontSize="12"
-                    Foreground="White"
-                    Margin="14,4,0,0"
-                    Text="{Binding IndexedFileCount.Count, StringFormat='Indexed files: {0}'}" />
-
-                <Separator BorderBrush="#777" Margin="2,4" />
-                <!--  Actions  -->
-                <Button
-                    Command="{Binding IndexFilesCommand}"
-                    Content="Reindex files"
-                    HorizontalAlignment="Left"
-                    Margin="14,4"
-                    Padding="4" />
-                <Button
-                    Command="{Binding OpenFileOptionsCommand}"
-                    Content="File indexing options"
-                    HorizontalAlignment="Left"
-                    Margin="14,4"
-                    Padding="4" />
-                <Button
-                    Command="{Binding OpenDirOptionsCommand}"
-                    Content="Directory indexing options"
-                    HorizontalAlignment="Left"
-                    Margin="14,4"
-                    Padding="4" />
-
-                <Separator BorderBrush="#777" Margin="2,4" />
-
-                <!--  Exit  -->
-                <Button
-                    Command="{Binding ExitCommand}"
-                    Content="Exit"
-                    HorizontalAlignment="Left"
-                    Margin="14,4"
-                    Padding="4" />
-
-            </StackPanel>
+            </ScrollViewer>
         </Border>
-
         <!--  Overlayed ProgressRing  -->
         <Grid
             HorizontalAlignment="Stretch"

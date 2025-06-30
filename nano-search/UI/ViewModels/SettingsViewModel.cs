@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Input;
 using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
+using NanoSearch.Navigation.Hotkey;
 using NanoSearch.Services;
 using NanoSearch.UI.Services;
 using NanoSearch.UI.ViewModels.Properties;
@@ -22,17 +23,20 @@ public class SettingsViewModel : INotifyPropertyChanged
     
     public ISnackbarService snackbarService { get; }
     public IContentDialogService snackDialogService { get; }
+    private readonly IConfigService<IndexingOptions> _indexingConfig;
+    private readonly IConfigService<KeybindingsOptions> _keybindingsConfig;
     
     public ICommand TrayToggledCommand        { get; }
     public ICommand DriveCheckedCommand       { get; }
     public ICommand IndexFilesCommand         { get; }
+    public ICommand OpenKeybindingsCommand        { get; }
     public ICommand OpenFileOptionsCommand    { get; }
     public ICommand OpenDirOptionsCommand     { get; }
     public ICommand ExitCommand               { get; }
     
     private readonly IDialogService _dialogService;
-    private readonly IndexingOptions _options;
-    private readonly JsonConfigService _configService;
+    /*private readonly IndexingOptions _options;
+    private readonly JsonConfigService _configService;*/
     private readonly IFileCountProvider _fileCountProvider;
     private readonly Action _onOptionsChanged;
     private bool _isIndexing;
@@ -59,11 +63,13 @@ public class SettingsViewModel : INotifyPropertyChanged
             IndexedFileCount.Count = _fileCountProvider.Count;
         }
     }
-    public SettingsViewModel(IDialogService dialogService, IndexingOptions options, JsonConfigService configService, IFileCountProvider  fileCountProvider, Action onOptionsChanged)
+    public SettingsViewModel(IDialogService dialogService, IConfigService<IndexingOptions> indexingConfig,
+        IConfigService<KeybindingsOptions> keybindingConfig, IFileCountProvider  fileCountProvider, Action onOptionsChanged)
     {
         _dialogService          = dialogService;
-        _options            = options;
-        _configService             = configService;
+        //_options            = options;
+        _indexingConfig     = indexingConfig;
+        _keybindingsConfig  = keybindingConfig;
         _fileCountProvider  = fileCountProvider;
         _onOptionsChanged   = onOptionsChanged;
 
@@ -76,21 +82,22 @@ public class SettingsViewModel : INotifyPropertyChanged
                 .Where(d => d.DriveType is DriveType.Fixed or DriveType.Removable)
                 .Select(d => d.Name) // e.g. "C:\"
                 .Select(letter => 
-                    new DriveOption(letter, options.DrivesToIndex.Contains(letter)))
+                    new DriveOption(letter, _indexingConfig.Options.DrivesToIndex.Contains(letter)))
         );
 
-        ShowInTrayOption   = new ShowInTrayOption { ShowInTray = options.ShowInTray };
+        ShowInTrayOption   = new ShowInTrayOption { ShowInTray = _indexingConfig.Options.ShowInTray };
         IndexedFileCount   = new IndexedFileCount { Count = _fileCountProvider.Count };
 
         // Commands
         TrayToggledCommand = new RelayCommand(TrayToggled);
         DriveCheckedCommand    = new RelayCommand(DriveChecked);
         IndexFilesCommand = new RelayCommand(() => OnOptionsChanged().ConfigureAwait(false));
+        OpenKeybindingsCommand = new RelayCommand(OpenKeybindingsOptions);
         OpenFileOptionsCommand = new RelayCommand(OpenFileOptions);
         OpenDirOptionsCommand  = new RelayCommand(OpenDirOptions);
         ExitCommand            = new RelayCommand(Exit);
     }
-    
+
     private void TrayToggled()
     {
         snackbarService.Show(
@@ -100,30 +107,44 @@ public class SettingsViewModel : INotifyPropertyChanged
             new SymbolIcon(SymbolRegular.Fluent24, 1D), 
             TimeSpan.FromSeconds(4));
         
-        _options.ShowInTray = ShowInTrayOption.ShowInTray;
-        _configService.Save();
+        _indexingConfig.Options.ShowInTray = ShowInTrayOption.ShowInTray;
+        _indexingConfig.Save();
     }
 
     private void DriveChecked()
     {
-        _options.DrivesToIndex.Clear();
+        _indexingConfig.Options.DrivesToIndex.Clear();
         foreach (var d in AllDrives.Where(x => x.Include))
-            _options.DrivesToIndex.Add(d.DriveLetter);
+            _indexingConfig.Options.DrivesToIndex.Add(d.DriveLetter);
 
-        _configService.Save();
+        _indexingConfig.Save();
         _ = OnOptionsChanged();
     }
 
+    private void OpenKeybindingsOptions()
+    {
+        _keybindingsConfig.Load();
+        var clonedOpts = new KeybindingsOptions();
+        clonedOpts.CopyFrom(_keybindingsConfig.Options);
+        var dlg = new KeybindingsOptionsViewModel(clonedOpts);
+        if (_dialogService.ShowDialog(dlg))
+        {
+            _keybindingsConfig.Options.CopyFrom(clonedOpts);
+            _keybindingsConfig.Save();
+        }
+        _ = OnOptionsChanged();
+    }
+    
     private void OpenFileOptions()
     {
-        _configService.Load();
+        _indexingConfig.Load();
         var clonedOpts = new FileFilterOptions();
-        clonedOpts.CopyFrom(_options.FileFilter);
+        clonedOpts.CopyFrom(_indexingConfig.Options.FileFilter);
         var dlg = new FileFilterOptionsViewModel(clonedOpts);
         if (_dialogService.ShowDialog(dlg))
         {
-            _options.FileFilter.CopyFrom(clonedOpts);
-            _configService.Save();
+            _indexingConfig.Options.FileFilter.CopyFrom(clonedOpts);
+            _indexingConfig.Save();
         }
 
         _ = OnOptionsChanged();
@@ -131,21 +152,22 @@ public class SettingsViewModel : INotifyPropertyChanged
 
     private void OpenDirOptions()
     {
-        _configService.Load();
+        _indexingConfig.Load();
         var clonedOpts = new DirectoryFilterOptions();
-        clonedOpts.CopyFrom(_options.DirectoryFilter);
+        clonedOpts.CopyFrom(_indexingConfig.Options.DirectoryFilter);
         var dlg = new DirectoryFilterOptionsViewModel(clonedOpts);
         if (_dialogService.ShowDialog(dlg))
         {
-            _options.DirectoryFilter.CopyFrom(clonedOpts);
-            _configService.Save();
+            _indexingConfig.Options.DirectoryFilter.CopyFrom(clonedOpts);
+            _indexingConfig.Save();
         }
         _ = OnOptionsChanged();
     }
 
     private void Exit()
     {
-        _configService.Save();
+        _indexingConfig.Save();
+        _keybindingsConfig.Save();
         Application.Current.Shutdown();
     }
     public event PropertyChangedEventHandler? PropertyChanged;

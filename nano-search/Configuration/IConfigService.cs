@@ -2,9 +2,9 @@
 
 namespace NanoSearch.Configuration;
 
-public interface IConfigService
+public interface IConfigService<T>
 {
-    IndexingOptions IndexingOptions { get; }
+    T Options { get; }
     void Load();
     void Save();
 }

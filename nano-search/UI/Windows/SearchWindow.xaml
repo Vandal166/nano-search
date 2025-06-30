@@ -54,7 +54,7 @@
                 IsHitTestVisible="False"
                 Margin="10,0,0,0"
                 SpellCheck.IsEnabled="False"
-                Text="Type in app name or pattern (e.g., *.exe)"
+                Text="Search apps"
                 VerticalAlignment="Center"
                 Visibility="{Binding Text.IsEmpty, ElementName=SearchBox, Converter={StaticResource BooleanToVisibilityConverter}}" />
         </Grid>

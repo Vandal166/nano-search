@@ -3,7 +3,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using NanoSearch.Launchers;
 using NanoSearch.Navigation;
-using NanoSearch.Navigation.Hotkey;
 using NanoSearch.Services;
 using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
@@ -43,15 +42,9 @@ public partial class SearchWindow : FluentWindow
         // to center
         Loaded += (s, e) =>
         {
-            IHotKeyService _hotkeys = new HotKeyService(this);
-            _hotkeys.RegisterGlobal(KeyModifiers.Alt, Keys.Space,
-                () => {
-                    ShowAndFocus();
-                });
             ShowAndFocus();
             Top = SystemParameters.WorkArea.Height / 2 - Height * 2;
             Left = SystemParameters.WorkArea.Width / 2 - Width / 2;
-            
         };
         
         Activated += (_, _) => {
