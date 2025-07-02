@@ -1,22 +1,37 @@
-﻿using NanoSearch.Navigation.Hotkey;
+﻿using System.Text.Json.Serialization;
+using NanoSearch.Navigation.Hotkey;
 
-namespace NanoSearch.Configuration.Indexing;
+namespace NanoSearch.Configuration.Keybindings;
 
-public sealed class KeybindingsOptions
+public sealed partial class KeybindingsOptions
 {
-    public KeyModifiers ToggleWindowModifiers { get; set; } = KeyModifiers.Alt;
-    public Keys ToggleWindowKey { get; set; } = Keys.Space;
-    
-    /*etc for search result navigation*/
-    
-    public void CopyFrom(KeybindingsOptions? other)
+    [JsonInclude]
+    public Dictionary<HotkeyAction, Keybinding> Bindings { get; set; } 
+        = Enum
+            .GetValues<HotkeyAction>()
+            .ToDictionary(
+                a => a,
+                a => a switch
+                {
+                    HotkeyAction.ToggleWindow   => new Keybinding { Modifiers = KeyModifiers.Alt, Key = Keys.Space },
+                    HotkeyAction.NavigateDown   => new Keybinding { Modifiers = KeyModifiers.NoMod, Key = Keys.Down },
+                    HotkeyAction.NavigateUp     => new Keybinding { Modifiers = KeyModifiers.NoMod, Key = Keys.Up },
+                    HotkeyAction.LaunchSelection=> new Keybinding { Modifiers = KeyModifiers.NoMod, Key = Keys.Enter },
+                    _                           => new Keybinding()
+                });
+
+    public void CopyFrom(KeybindingsOptions other)
     {
-        if (other == null) 
-            return;
-        
-        ToggleWindowModifiers = other.ToggleWindowModifiers;
-        ToggleWindowKey = other.ToggleWindowKey;
-        
-        /*etc for search result navigation*/
+        foreach (var kv in other.Bindings)
+            Bindings[kv.Key] = new Keybinding 
+                { Modifiers = kv.Value.Modifiers, Key = kv.Value.Key };
     }
+
+    public static string HotkeyToString(HotkeyAction action)
+    {
+        return MyRegex().Replace(action.ToString(), " $1");
+    }
+
+    [System.Text.RegularExpressions.GeneratedRegex("(\\B[A-Z])")]
+    private static partial System.Text.RegularExpressions.Regex MyRegex();
 }

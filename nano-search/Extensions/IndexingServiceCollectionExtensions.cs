@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using NanoSearch.Algorithms.Indexer;
 using NanoSearch.Configuration.Indexing;
+using NanoSearch.Configuration.Keybindings;
+using NanoSearch.Configuration.Validators;
 
 namespace NanoSearch.Configuration.Services;
 
@@ -8,12 +10,18 @@ public static class IndexingServiceCollectionExtensions
 {
     public static IServiceCollection AddIndexing(this IServiceCollection services)
     {
-        /*services.AddSingleton<IndexingOptions>();*/
-        services.AddSingleton<IConfigService<IndexingOptions>>(
-            _ => new JsonConfigService<IndexingOptions>("indexing_options.json"));
+        services.AddSingleton<IValidator<KeybindingsOptions>, KeybindingsOptionsValidator>();
+        services.AddSingleton<IValidator<FileFilterOptions>, FileFilterOptionsValidator>();
+        services.AddSingleton<IValidator<DirectoryFilterOptions>, DirectoryFilterOptionsValidator>();
+        services.AddSingleton<IValidator<IndexingOptions>, IndexingOptionsValidator>();
+//etc
+        services.AddSingleton<IConfigService<IndexingOptions>>(p =>
+            new JsonConfigService<IndexingOptions>("indexing_options.json", p.GetRequiredService<IValidator<IndexingOptions>>())
+        );
 
-        services.AddSingleton<IConfigService<KeybindingsOptions>>(
-            _ => new JsonConfigService<KeybindingsOptions>("keybindings.json"));
+        services.AddSingleton<IConfigService<KeybindingsOptions>>(p =>
+            new JsonConfigService<KeybindingsOptions>("keybindings.json", p.GetRequiredService<IValidator<KeybindingsOptions>>())
+        );
         
         services.AddSingleton<FilterPipeline>(sp =>
             FilterPipelineBuilder.Build(sp.GetRequiredService<IConfigService<IndexingOptions>>().Options)

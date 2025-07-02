@@ -3,7 +3,7 @@
     Height="450"
     ResizeMode="NoResize"
     Title="Keybindings Options"
-    Width="800"
+    Width="600"
     mc:Ignorable="d"
     x:Class="NanoSearch.UI.Windows.KeybindingsOptionsWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -18,18 +18,39 @@
         <viewModels:ListeningToBrushConverter x:Key="ListeningToBrushConverter" />
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Margin="16" Row="0">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
+        <!--  Header Row  -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,4">
+            <TextBlock
+                Foreground="White"
+                Text="Action name"
+                Width="180" />
+            <TextBlock
+                Foreground="White"
+                Margin="8,0"
+                Text="Modifier Key"
+                TextAlignment="Center"
+                Width="80" />
+            <TextBlock
+                Foreground="White"
+                Margin="8,0"
+                Text="Key"
+                TextAlignment="Center"
+                Width="100" />
+        </DockPanel>
+
         <!--  Keybindings List  -->
-        <ScrollViewer Grid.Row="0">
+        <ScrollViewer Grid.Row="1">
             <ItemsControl ItemsSource="{Binding Keybindings}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <DockPanel Margin="0,4">
+                        <DockPanel Margin="0,24,0,4">
                             <TextBlock
                                 Foreground="White"
                                 Text="{Binding Name}"
@@ -64,7 +85,7 @@
         </ScrollViewer>
 
         <!--  OK / Cancel  -->
-        <Grid Grid.Row="1" Margin="0,8,0,0">
+        <Grid Grid.Row="2" Margin="0,8,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
+using NanoSearch.Configuration.Keybindings;
 using NanoSearch.Configuration.Services;
 using NanoSearch.Navigation.Hotkey;
 using NanoSearch.UI.Windows;
@@ -27,7 +28,6 @@ public partial class App : Application
             .AddNavigation();
         
         _serviceProvider = services.BuildServiceProvider();
-        
         var searchWindow = _serviceProvider.GetRequiredService<SearchWindow>();
         
         // if Show in Tray is true in the cfg then load the tray icon
@@ -46,6 +46,8 @@ public partial class App : Application
 
         searchWindow.Show();
         _serviceProvider.GetRequiredService<IHotKeyService>();
+        _serviceProvider.GetRequiredService<ValidationErrorBox<KeybindingsOptions>>();
+        _serviceProvider.GetRequiredService<ValidationErrorBox<IndexingOptions>>();
     }
 
     private void TrayIcon_DoubleClick(object? sender, EventArgs e)

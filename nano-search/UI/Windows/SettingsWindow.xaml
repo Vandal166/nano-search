@@ -105,7 +105,7 @@
                         FontSize="12"
                         Foreground="White"
                         Margin="4,2"
-                        Text="Disks to index:" />
+                        Text="Drives to index:" />
                     <ItemsControl ItemsSource="{Binding AllDrives}" Margin="4,0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>

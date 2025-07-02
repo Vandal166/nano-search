@@ -4,6 +4,7 @@ using System.IO;
 using System.Windows.Input;
 using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
+using NanoSearch.Configuration.Keybindings;
 using NanoSearch.Navigation.Hotkey;
 using NanoSearch.Services;
 using NanoSearch.UI.Services;
@@ -35,8 +36,6 @@ public class SettingsViewModel : INotifyPropertyChanged
     public ICommand ExitCommand               { get; }
     
     private readonly IDialogService _dialogService;
-    /*private readonly IndexingOptions _options;
-    private readonly JsonConfigService _configService;*/
     private readonly IFileCountProvider _fileCountProvider;
     private readonly Action _onOptionsChanged;
     private bool _isIndexing;

@@ -6,4 +6,5 @@ public interface INavigationService
 {
     void Attach(ListBox listBox);
     void Detach();
+    void RebuildMap();
 }

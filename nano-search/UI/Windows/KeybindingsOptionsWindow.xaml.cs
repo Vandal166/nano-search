@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using NanoSearch.Navigation.Hotkey;
 using NanoSearch.UI.ViewModels;
-using KeyEventArgs = System.Windows.Forms.KeyEventArgs;
 using TextBox = System.Windows.Controls.TextBox;
 namespace NanoSearch.UI.Windows;
 
@@ -24,12 +24,13 @@ public partial class KeybindingsOptionsWindow : Window
 
     private void ModifiersBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
-        if (sender is TextBox tb && tb.DataContext is KeybindingItemViewModel vm && vm.IsListeningForModifiers)
+        if (sender is TextBox tb && tb.DataContext is KeybindingItemViewModel vm && vm.IsListeningForModifiers && e.Key != Key.Escape)
         {
             tb.Focus();
             // Convert Key to KeyModifiers
-            var key = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
-            //vm.Modifiers = key; // Assuming you have a helper method to convert
+            //int key = KeyInterop.VirtualKeyFromKey(e.Key);
+            vm.Modifiers = GetCurrentModifiers();
+            tb.Text = vm.Modifiers.ToString();
             vm.IsListeningForModifiers = false;
             e.Handled = true;
         }
@@ -48,10 +49,11 @@ public partial class KeybindingsOptionsWindow : Window
 
     private void KeyBox_PreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
     {
-        if (sender is TextBox tb && tb.DataContext is KeybindingItemViewModel vm && vm.IsListeningForKey)
+        if (sender is TextBox tb && tb.DataContext is KeybindingItemViewModel vm && vm.IsListeningForKey && e.Key != Key.Escape)
         {
             tb.Focus();
             vm.Key = (Keys)KeyInterop.VirtualKeyFromKey(e.Key);
+            tb.Text = vm.Key.ToString();
             // Optionally set Modifiers as well
             vm.IsListeningForKey = false;
             e.Handled = true;
@@ -71,5 +73,17 @@ public partial class KeybindingsOptionsWindow : Window
             e.Handled = true; // Prevents the button from being clicked
         }
     }
-
+    private static KeyModifiers GetCurrentModifiers()
+    {
+        KeyModifiers modifiers = KeyModifiers.NoMod;
+        if ((Keyboard.Modifiers & ModifierKeys.Alt) == ModifierKeys.Alt)
+            modifiers |= KeyModifiers.Alt;
+        if ((Keyboard.Modifiers & ModifierKeys.Control) == ModifierKeys.Control)
+            modifiers |= KeyModifiers.Ctrl;
+        if ((Keyboard.Modifiers & ModifierKeys.Shift) == ModifierKeys.Shift)
+            modifiers |= KeyModifiers.Shift;
+        if ((Keyboard.Modifiers & ModifierKeys.Windows) == ModifierKeys.Windows)
+            modifiers |= KeyModifiers.Win;
+        return modifiers;
+    }
 }

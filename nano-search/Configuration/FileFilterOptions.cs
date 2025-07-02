@@ -1,5 +1,4 @@
-﻿using System.ComponentModel;
-using System.IO;
+﻿using System.IO;
 using System.Text.Json.Serialization;
 
 namespace NanoSearch.Configuration.Indexing;

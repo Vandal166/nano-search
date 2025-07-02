@@ -1,19 +1,34 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using NanoSearch.Configuration;
+using NanoSearch.Configuration.Indexing;
+using NanoSearch.Configuration.Keybindings;
+using NanoSearch.Launchers;
 using ListBox = System.Windows.Controls.ListBox;
 
 namespace NanoSearch.Navigation;
 
 public class ListBoxNavigationService : INavigationService
 {
-    private readonly Dictionary<Key, INavigationStrategy> _keyStrategiesMap;
+    private readonly IListBoxNavigationStrategyFactory _factory;
+    private readonly IAppLauncher _appLauncher;
+    private Dictionary<Key, INavigationStrategy> _keyStrategiesMap;
     private ListBox? _listBox;
     private Window? _window;
     
-    public ListBoxNavigationService(IEnumerable<INavigationStrategy> strategies)
+    public ListBoxNavigationService(IListBoxNavigationStrategyFactory factory,IAppLauncher appLauncher, IConfigService<KeybindingsOptions> kbConfig)
     {
+        _factory = factory;
+        _appLauncher = appLauncher;
+        kbConfig.OptionsChanged += (_,__) => RebuildMap();
+    }
+
+    public void RebuildMap()
+    {
+        var strategies = _factory.CreateStrategies(_appLauncher);
         _keyStrategiesMap = strategies.ToDictionary(s => s.ShortcutKey, s => s); // mapping <shortcut key, strategy>
     }
+
     public void Attach(ListBox listBox)
     {
         _listBox    = listBox;
