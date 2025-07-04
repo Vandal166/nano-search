@@ -27,11 +27,7 @@ public static class NavigationServiceCollectionExtensions
 
             return new ShowWindowHotKey(window);
         });
-
         
-        services.AddSingleton<ListBoxNavigateDownStrategy>();
-        services.AddSingleton<ListboxNavigationUpStrategy>();
-        services.AddSingleton<ListboxNavigationEnterStrategy>();
         services.AddSingleton<IListBoxNavigationStrategyFactory, ListBoxNavigationStrategyFactory>();
         services.AddSingleton<INavigationService>(provider =>
         {

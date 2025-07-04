@@ -12,8 +12,10 @@
                 <ui:ControlsDictionary />
                 <ui:ThemesDictionary Theme="Dark" />
             </ResourceDictionary.MergedDictionaries>
+
             <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <BitmapImage UriSource="pack://application:,,,/nano-search;component/Resources/explorer-icon-light.ico" x:Key="ExplorerIcon" />
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

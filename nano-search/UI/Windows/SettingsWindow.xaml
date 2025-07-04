@@ -89,10 +89,10 @@
 
                     <!--  Show in tray  -->
                     <CheckBox
-                        Command="{Binding TrayToggledCommand}"
+                        Command="{Binding Indexing.TrayToggledCommand}"
                         Content="Show in tray"
                         Foreground="White"
-                        IsChecked="{Binding ShowInTrayOption.ShowInTray, Mode=TwoWay}"
+                        IsChecked="{Binding Indexing.ShowInTrayOption.ShowInTray, Mode=TwoWay}"
                         Margin="8,0"
                         Padding="0" />
 
@@ -106,7 +106,7 @@
                         Foreground="White"
                         Margin="4,2"
                         Text="Drives to index:" />
-                    <ItemsControl ItemsSource="{Binding AllDrives}" Margin="4,0">
+                    <ItemsControl ItemsSource="{Binding Indexing.AllDrives}" Margin="4,0">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <UniformGrid Columns="3" />
@@ -115,7 +115,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <CheckBox
-                                    Command="{Binding DataContext.DriveCheckedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                    Command="{Binding DataContext.Indexing.DriveCheckedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                                     Content="{Binding DriveLetter}"
                                     Foreground="White"
                                     IsChecked="{Binding Include, Mode=TwoWay}"
@@ -130,12 +130,12 @@
                         FontSize="12"
                         Foreground="White"
                         Margin="14,4,0,0"
-                        Text="{Binding IndexedFileCount.Count, StringFormat='Indexed files: {0}'}" />
+                        Text="{Binding Indexing.IndexedFileCount.Count, StringFormat='Indexed files: {0}'}" />
 
                     <Separator BorderBrush="#777" Margin="2,4" />
                     <!--  Actions  -->
                     <Button
-                        Command="{Binding IndexFilesCommand}"
+                        Command="{Binding Indexing.IndexFilesCommand}"
                         Content="Reindex files"
                         HorizontalAlignment="Left"
                         Margin="14,4"
@@ -147,19 +147,19 @@
                         Margin="10,0,10,0">
                         <StackPanel>
                             <Button
-                                Command="{Binding OpenKeybindingsCommand}"
+                                Command="{Binding Keybindings.OpenKeybindingsCommand}"
                                 Content="Edit Keybindings"
                                 HorizontalAlignment="Left"
                                 Margin="0,4"
                                 Padding="0" />
                             <Button
-                                Command="{Binding OpenFileOptionsCommand}"
+                                Command="{Binding Indexing.OpenFileOptionsCommand}"
                                 Content="File indexing options"
                                 HorizontalAlignment="Left"
                                 Margin="0,4"
                                 Padding="0" />
                             <Button
-                                Command="{Binding OpenDirOptionsCommand}"
+                                Command="{Binding Indexing.OpenDirOptionsCommand}"
                                 Content="Directory indexing options"
                                 HorizontalAlignment="Left"
                                 Margin="0,4"
@@ -184,7 +184,7 @@
             HorizontalAlignment="Stretch"
             Panel.ZIndex="100"
             VerticalAlignment="Stretch"
-            Visibility="{Binding IsIndexing, Converter={StaticResource BoolToVis}}">
+            Visibility="{Binding Indexing.IsIndexing, Converter={StaticResource BoolToVis}}">
             <Border
                 Background="#AA222222"
                 Effect="{DynamicResource BlurEffect}"

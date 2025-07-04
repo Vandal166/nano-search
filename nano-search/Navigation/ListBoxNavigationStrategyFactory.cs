@@ -1,5 +1,4 @@
 ﻿using NanoSearch.Configuration;
-using NanoSearch.Configuration.Indexing;
 using NanoSearch.Configuration.Keybindings;
 using NanoSearch.Launchers;
 using NanoSearch.Services;

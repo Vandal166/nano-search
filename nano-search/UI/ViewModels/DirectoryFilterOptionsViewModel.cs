@@ -61,7 +61,7 @@ public class DirectoryFilterOptionsViewModel : INotifyPropertyChanged
     public ICommand RemoveExcludedDirNameCommand { get; }
     public ICommand ResetToDefaultCommand { get; }
     
-    public DirectoryFilterOptionsViewModel(DirectoryFilterOptions options)//TODO use IConfigService<DirectoryFilterOptions> instead?
+    public DirectoryFilterOptionsViewModel(DirectoryFilterOptions options)
     {
         _options = options;
         

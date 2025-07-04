@@ -18,7 +18,13 @@ public class FileExtensionFilter : IFileSystemEntry
         if (lastDot < 0)
             return true; // No extension, skip
         
-        var ext = fileName.Slice(lastDot).ToString();
-        return !_includedExtensions.Contains(ext);
+        ReadOnlySpan<char> ext = fileName.Slice(lastDot);
+
+        foreach (var includedExt in _includedExtensions)
+        {
+            if (ext.Equals(includedExt, StringComparison.OrdinalIgnoreCase))
+                return false;
+        }
+        return true;
     }
 }

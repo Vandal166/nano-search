@@ -5,8 +5,11 @@ using NanoSearch.Configuration.Indexing;
 using NanoSearch.Configuration.Keybindings;
 using NanoSearch.Configuration.Services;
 using NanoSearch.Navigation.Hotkey;
+using NanoSearch.UI;
 using NanoSearch.UI.Windows;
+using Wpf.Ui.Appearance;
 using Application = System.Windows.Application;
+using MessageBox = Wpf.Ui.Controls.MessageBox;
 
 namespace NanoSearch;
 
@@ -14,11 +17,12 @@ public partial class App : Application
 {
     private NotifyIcon? _trayIcon;
     private ServiceProvider _serviceProvider = null!;
-    
+
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        
+        ApplicationThemeManager.ApplySystemTheme(updateAccent: true);
+           
         // DI setup
         var services = new ServiceCollection()
             .AddIndexing()
@@ -28,6 +32,9 @@ public partial class App : Application
             .AddNavigation();
         
         _serviceProvider = services.BuildServiceProvider();
+        _serviceProvider.GetRequiredService<ValidationErrorBox<IndexingOptions>>();
+        _serviceProvider.GetRequiredService<ValidationErrorBox<KeybindingsOptions>>();
+        
         var searchWindow = _serviceProvider.GetRequiredService<SearchWindow>();
         
         // if Show in Tray is true in the cfg then load the tray icon
@@ -45,9 +52,20 @@ public partial class App : Application
         }
 
         searchWindow.Show();
+        if (ApplicationThemeManager.GetSystemTheme() == SystemTheme.Light)
+        {
+            var messageBox = new MessageBox
+            {
+                Title = "Light Mode Detected",
+                Content = "Light mode detected, switch your system to Dark mode as light mode is not supported yet.",
+                CloseButtonText = "OK",
+                ShowTitle = true
+            };
+            messageBox.ShowDialogAsync();
+        }
+        SystemThemeWatcher.Watch(searchWindow);
         _serviceProvider.GetRequiredService<IHotKeyService>();
-        _serviceProvider.GetRequiredService<ValidationErrorBox<KeybindingsOptions>>();
-        _serviceProvider.GetRequiredService<ValidationErrorBox<IndexingOptions>>();
+        
     }
 
     private void TrayIcon_DoubleClick(object? sender, EventArgs e)

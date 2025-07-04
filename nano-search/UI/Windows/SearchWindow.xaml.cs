@@ -4,7 +4,6 @@ using System.Windows.Input;
 using NanoSearch.Launchers;
 using NanoSearch.Navigation;
 using NanoSearch.Services;
-using Wpf.Ui.Appearance;
 using Wpf.Ui.Controls;
 
 // ReSharper disable once ConvertClosureToMethodGroup
@@ -30,15 +29,6 @@ public partial class SearchWindow : FluentWindow
         _appLauncher = appLauncher;
         _navigation = navigation;
 
-        Console.WriteLine($"Indexer loaded and indexed - count :{searchService.Count}");
-        ApplicationThemeManager.Apply(
-            ApplicationTheme.Dark,                // Light or Dark theme
-            WindowBackdropType.Mica,             // Mica or Acrylic
-            updateAccent: true
-        );
-        
-        SystemThemeWatcher.Watch(this);
-        
         // to center
         Loaded += (s, e) =>
         {

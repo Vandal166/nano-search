@@ -15,9 +15,9 @@ public class CompositeFilter: IFileSystemEntry
 
     public bool ShouldSkip(ref FileSystemEntry entry)
     {
-        foreach (var filter in _filters)
+        for (int i = 0; i < _filters.Count; i++) // using for loop to avoid boxing since _filters is a list of interfaces
         {
-            if (filter.ShouldSkip(ref entry))
+            if (_filters[i].ShouldSkip(ref entry))
                 return true;
         }
         return false;

@@ -18,7 +18,6 @@ public sealed class FileIndexer : IFileCountProvider
 
     public void IndexFileSystem(HashSet<string> rootPath, FilterPipeline filterPipeline)
     {
-        Console.WriteLine("indexing");
         if(RadixTree.Count > 0)
         {
             RadixTree.Clear();
@@ -43,12 +42,9 @@ public sealed class FileIndexer : IFileCountProvider
             }
         }
         
-        Stopwatch stopwatch = Stopwatch.StartNew();
         // collecting files in parallel
         Parallel.ForEach(directories, parallelOptions, TraverseDirectories);
-        stopwatch.Stop();
-       //_notification.Post($"File indexing completed in {stopwatch.ElapsedMilliseconds} ms.");
-        
+       
         BuildRadixTree();
         Console.WriteLine($"Indexed files - count :{Count}");
     }

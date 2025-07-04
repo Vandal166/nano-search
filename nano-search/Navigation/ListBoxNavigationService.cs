@@ -1,7 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using NanoSearch.Configuration;
-using NanoSearch.Configuration.Indexing;
 using NanoSearch.Configuration.Keybindings;
 using NanoSearch.Launchers;
 using ListBox = System.Windows.Controls.ListBox;
@@ -16,11 +15,12 @@ public class ListBoxNavigationService : INavigationService
     private ListBox? _listBox;
     private Window? _window;
     
-    public ListBoxNavigationService(IListBoxNavigationStrategyFactory factory,IAppLauncher appLauncher, IConfigService<KeybindingsOptions> kbConfig)
+    public ListBoxNavigationService(IListBoxNavigationStrategyFactory factory, IAppLauncher appLauncher, IConfigService<KeybindingsOptions> kbConfig)
     {
         _factory = factory;
         _appLauncher = appLauncher;
         kbConfig.OptionsChanged += (_,__) => RebuildMap();
+        RebuildMap(); // initial map build
     }
 
     public void RebuildMap()

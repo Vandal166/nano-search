@@ -1,8 +1,8 @@
 ﻿using NanoSearch.Configuration;
-using NanoSearch.Configuration.Indexing;
 using MessageBox = Wpf.Ui.Controls.MessageBox;
 
-namespace NanoSearch;
+namespace NanoSearch.UI;
+
 public class ValidationErrorBox<TOptions> where TOptions : class, new()
 {
     public ValidationErrorBox(IConfigService<TOptions> configService)

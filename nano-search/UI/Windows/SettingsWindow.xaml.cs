@@ -10,8 +10,8 @@ public partial class SettingsWindow : Window
         InitializeComponent();
         DataContext = vm;
         
-        vm.snackDialogService.SetDialogHost(RootContentDialog);
-        vm.snackbarService.SetSnackbarPresenter(SnackbarPresenter);
+        vm.Indexing.snackDialogService.SetDialogHost(RootContentDialog);
+        vm.Indexing.snackbarService.SetSnackbarPresenter(SnackbarPresenter);
         
         Deactivated += (s, e) =>
         {

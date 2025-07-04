@@ -26,32 +26,37 @@ public static class SettingsUIServiceCollectionExtensions
         services.AddTransient<DirectoryFilterOptionsWindow>();
 
         // Settings panel
-        services.AddSingleton<SettingsViewModel>(provider =>
+        services.AddSingleton<IndexingSettingsViewModel>(provider =>
         {
             var dialogService = provider.GetRequiredService<IDialogService>();
             var indexingConfigService = provider.GetRequiredService<IConfigService<IndexingOptions>>();
-            var keybindingsConfigService = provider.GetRequiredService<IConfigService<KeybindingsOptions>>();
             var fileIndexer = provider.GetRequiredService<FileIndexer>();
             Action onOptionsChanged = () =>
             {
                 var pipeline = FilterPipelineBuilder.Build(indexingConfigService.Options);
-                fileIndexer.IndexFileSystem(indexingConfigService.Options.DrivesToIndex, pipeline);
-                keybindingsConfigService.Load();
+                provider.GetRequiredService<FileIndexer>().IndexFileSystem(indexingConfigService.Options.DrivesToIndex, pipeline);
             };
-            return new SettingsViewModel(dialogService, indexingConfigService, keybindingsConfigService, fileIndexer, onOptionsChanged);
+            return new IndexingSettingsViewModel(dialogService, indexingConfigService, fileIndexer, onOptionsChanged);
+        });
+        
+        services.AddSingleton<KeybindingsSettingsViewModel>(provider =>
+        {
+            var dialogService = provider.GetRequiredService<IDialogService>();
+            var keybindingsConfigService = provider.GetRequiredService<IConfigService<KeybindingsOptions>>();
+            Action onOptionsChanged = () =>
+            {
+                //noop
+            };
+            return new KeybindingsSettingsViewModel(dialogService, keybindingsConfigService, onOptionsChanged);
+        });
+        
+        services.AddSingleton<SettingsViewModel>(provider =>
+        {
+            var indexingSettings = provider.GetRequiredService<IndexingSettingsViewModel>();
+            var keybindingsSettings = provider.GetRequiredService<KeybindingsSettingsViewModel>();
+            return new SettingsViewModel(indexingSettings, keybindingsSettings);
         });
         services.AddSingleton<SettingsWindow>();
-        
-        services.AddSingleton<ValidationErrorBox<KeybindingsOptions>>(provider =>
-        {
-            var configService = provider.GetRequiredService<IConfigService<KeybindingsOptions>>();
-            return new ValidationErrorBox<KeybindingsOptions>(configService);
-        });
-        services.AddSingleton<ValidationErrorBox<IndexingOptions>>(provider =>
-        {
-            var configService = provider.GetRequiredService<IConfigService<IndexingOptions>>();
-            return new ValidationErrorBox<IndexingOptions>(configService);
-        });
 
         return services;
     }

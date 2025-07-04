@@ -30,7 +30,6 @@ public class JsonConfigService<T> : IConfigService<T> where T : new()
             Converters               = { new JsonStringEnumConverter() },
             PropertyNameCaseInsensitive = true
         };
-        Load();
     }
     public void Load()
     {
