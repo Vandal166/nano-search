@@ -1,6 +1,9 @@
 # nano-search
-
+## App Showcase
 ![App Showcase](showcase.gif)
+
+## Tray Showcase
+![Tray Showcase](showcase_tray.gif)
 
 
 Why not use the NTFS Master File Table (MFT) to scan?
