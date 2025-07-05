@@ -1,5 +1,8 @@
 # nano-search
 
+![App Showcase](showcase.gif)
+
+
 Why not use the NTFS Master File Table (MFT) to scan?
 - it requires admin privileges
 - works only for NTFS
