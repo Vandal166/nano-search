@@ -34,7 +34,7 @@ public class KeybindingsSettingsViewModel : INotifyPropertyChanged
         {
             _keybindingsConfig.Options.CopyFrom(clonedOpts);
             _keybindingsConfig.Save();
-        }
+        } //TODO invoke onOptionsChanged only if options were changed? otherwise it will call the IndexFileSystem each time
         _onOptionsChanged.Invoke();
     }
     
