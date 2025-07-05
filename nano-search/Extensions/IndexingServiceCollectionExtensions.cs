@@ -43,14 +43,8 @@ public static class IndexingServiceCollectionExtensions
         services.AddSingleton<FilterPipeline>(sp =>
             FilterPipelineBuilder.Build(sp.GetRequiredService<IConfigService<IndexingOptions>>().Options)
         );
-        
-        services.AddSingleton<FileIndexer>(sp => 
-        {
-            var idx = new FileIndexer();
-            var opts = sp.GetRequiredService<IConfigService<IndexingOptions>>().Options;
-            idx.IndexFileSystem(opts.DrivesToIndex, sp.GetRequiredService<FilterPipeline>());
-            return idx;
-        });
+
+        services.AddSingleton<FileIndexer>();
         
         services.AddTransient<FileFilterOptions>(provider =>
             provider.GetRequiredService<IConfigService<IndexingOptions>>().Options.FileFilter);

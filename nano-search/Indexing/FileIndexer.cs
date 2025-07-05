@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using NanoSearch.Configuration;
 using NanoSearch.Algorithms.RadixTrie;
+using NanoSearch.Configuration.Indexing;
 using NanoSearch.Enumerators;
 using NanoSearch.Services;
 
@@ -13,22 +13,29 @@ public sealed class FileIndexer : IFileCountProvider
 {
     public RadixTree<ImmutableHashSet<string>> RadixTree { get; } = new RadixTree<ImmutableHashSet<string>>();
     private readonly ConcurrentDictionary<string, ImmutableHashSet<string>> _fileDictionary = new();
-    private FilterPipeline _filterPipeline = null!;
+    private readonly FilterPipeline _filterPipeline;
     public ulong Count => RadixTree.Count;
+    
+    public FileIndexer(FilterPipeline filterPipeline, IConfigService<IndexingOptions> opts)
+    {
+        _filterPipeline = filterPipeline;
+        
+        IndexFileSystem(opts.Options.DrivesToIndex);
+    }
 
-    public void IndexFileSystem(HashSet<string> rootPath, FilterPipeline filterPipeline)
+    public void IndexFileSystem(HashSet<string> rootPath)
     {
         if(RadixTree.Count > 0)
         {
             RadixTree.Clear();
             _fileDictionary.Clear();
         }
-        _filterPipeline = filterPipeline;
+        
         var parallelOptions = new ParallelOptions
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount,
         };
-
+        
         List<string> directories = new List<string>(50 * rootPath.Count); // preallocating space for directories depending on the number of root paths
         foreach (var rootP in rootPath)
         {
@@ -46,7 +53,7 @@ public sealed class FileIndexer : IFileCountProvider
         Parallel.ForEach(directories, parallelOptions, TraverseDirectories);
        
         BuildRadixTree();
-        Console.WriteLine($"Indexed files - count :{Count}");
+        Console.WriteLine($"Indexed files - count : {Count}");
     }
     private void BuildRadixTree()
     {

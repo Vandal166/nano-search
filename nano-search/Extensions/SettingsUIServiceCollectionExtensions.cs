@@ -33,8 +33,7 @@ public static class SettingsUIServiceCollectionExtensions
             var fileIndexer = provider.GetRequiredService<FileIndexer>();
             Action onOptionsChanged = () =>
             {
-                var pipeline = FilterPipelineBuilder.Build(indexingConfigService.Options);
-                provider.GetRequiredService<FileIndexer>().IndexFileSystem(indexingConfigService.Options.DrivesToIndex, pipeline);
+                provider.GetRequiredService<FileIndexer>().IndexFileSystem(indexingConfigService.Options.DrivesToIndex);
             };
             return new IndexingSettingsViewModel(dialogService, indexingConfigService, fileIndexer, onOptionsChanged);
         });
