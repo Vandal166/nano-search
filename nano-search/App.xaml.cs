@@ -102,8 +102,28 @@ public partial class App : Application
             var cursor = System.Windows.Forms.Control.MousePosition;
             var settingsWindow = _serviceProvider.GetRequiredService<SettingsWindow>();
             settingsWindow.WindowStartupLocation = WindowStartupLocation.Manual;
-            settingsWindow.Left = cursor.X - (settingsWindow.Width);
-            settingsWindow.Top = cursor.Y - (settingsWindow.Height);
+            
+            if (!settingsWindow.IsVisible)
+            {
+                settingsWindow.Show();
+                settingsWindow.Hide();
+            }
+            
+            var source = PresentationSource.FromVisual(settingsWindow);
+            if (source?.CompositionTarget != null)
+            {
+                var transform = source.CompositionTarget.TransformFromDevice;
+                var point = transform.Transform(new System.Windows.Point(cursor.X, cursor.Y));
+                settingsWindow.Left = point.X - settingsWindow.Width;
+                settingsWindow.Top = point.Y - settingsWindow.Height;
+            }
+            else
+            {
+                // fallback
+                settingsWindow.Left = cursor.X - settingsWindow.Width;
+                settingsWindow.Top = cursor.Y - settingsWindow.Height;
+            }
+            
             settingsWindow.Show();
             settingsWindow.Activate();
         }
