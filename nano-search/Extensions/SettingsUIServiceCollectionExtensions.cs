@@ -33,7 +33,7 @@ public static class SettingsUIServiceCollectionExtensions
             var fileIndexer = provider.GetRequiredService<FileIndexer>();
             Action onOptionsChanged = () =>
             {
-                provider.GetRequiredService<FileIndexer>().IndexFileSystem(indexingConfigService.Options.DrivesToIndex);
+                fileIndexer.IndexFileSystem(indexingConfigService.Options.DrivesToIndex, FilterPipelineBuilder.Build(indexingConfigService.Options));
             };
             return new IndexingSettingsViewModel(dialogService, indexingConfigService, fileIndexer, onOptionsChanged);
         });
@@ -42,10 +42,8 @@ public static class SettingsUIServiceCollectionExtensions
         {
             var dialogService = provider.GetRequiredService<IDialogService>();
             var keybindingsConfigService = provider.GetRequiredService<IConfigService<KeybindingsOptions>>();
-            Action onOptionsChanged = () =>
-            {
-                //noop
-            };
+            Action onOptionsChanged = () => { /* noop */};
+            
             return new KeybindingsSettingsViewModel(dialogService, keybindingsConfigService, onOptionsChanged);
         });
         

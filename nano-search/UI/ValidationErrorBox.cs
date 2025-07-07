@@ -9,14 +9,10 @@ public class ValidationErrorBox<TOptions> where TOptions : class, new()
     {
         configService.ConfigurationLoadFailed += (sender, args) =>
         {
-            var messageBox = new MessageBox
-            {
-                Title = args.Title,
-                Content = args.Message,
-                CloseButtonText = "OK", // Set the close button text
-                ShowTitle = true
-            };
-            messageBox.ShowDialogAsync();
+            MessageBoxExtensions.Setup(
+                args.Title,
+                args.Message
+            ).Display();
         };
     }
 }

@@ -4,6 +4,7 @@ using System.Windows.Interop;
 using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
 using NanoSearch.Configuration.Keybindings;
+using NanoSearch.UI;
 
 namespace NanoSearch.Navigation.Hotkey;
 
@@ -43,7 +44,13 @@ public sealed class HotKeyService : IHotKeyService
         var id = _nextId++;
         var handle = _visual.Handle;
         if (!RegisterHotKey(handle, id, (int)mods, (int)key))
-            throw new InvalidOperationException($"Failed to register hotkey {mods} + {key}");
+        {
+            MessageBoxExtensions.Setup(
+                "Hotkey Unregistration Failed",
+                $"Failed to unregister hotkey {mods} + {key}"
+            ).Display();
+            return;
+        }
         _actions[id] = callback;
         Console.WriteLine($"Registered hotkey: {mods} + {key} with ID {id}");
     }
@@ -54,7 +61,13 @@ public sealed class HotKeyService : IHotKeyService
         foreach (var id in _actions.Keys)
         {
             if (!UnregisterHotKey(handle, id))
-                throw new InvalidOperationException($"Failed to unregister hotkey with ID {id}");
+            {
+                MessageBoxExtensions.Setup(
+                    "Hotkey Unregistration Failed",
+                    $"Failed to unregister hotkeys"
+                ).Display();
+                return;
+            }
         }
         _actions.Clear();
         Console.WriteLine("Unregistered all hotkeys.");

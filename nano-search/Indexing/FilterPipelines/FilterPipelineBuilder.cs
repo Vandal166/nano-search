@@ -6,7 +6,7 @@ namespace NanoSearch.Configuration;
 /// <summary>
 /// Builds a filter pipeline based on the provided indexing options
 /// </summary>
-public sealed class FilterPipelineBuilder
+public static class FilterPipelineBuilder
 {
     public static FilterPipeline Build(IndexingOptions opts)
     {

@@ -126,9 +126,9 @@ public class IndexingSettingsViewModel : INotifyPropertyChanged
         {
             _indexingConfig.Options.FileFilter.CopyFrom(clonedOpts);
             _indexingConfig.Save();
+            _ = OnOptionsChanged();
         }
 
-        _ = OnOptionsChanged();
     }
     private void OpenDirOptions()
     {
@@ -139,9 +139,9 @@ public class IndexingSettingsViewModel : INotifyPropertyChanged
         if (_dialogService.ShowDialog(dlg))
         {
             _indexingConfig.Options.DirectoryFilter.CopyFrom(clonedOpts);
-            _indexingConfig.Save();
+            _indexingConfig.Save(); 
+            _ = OnOptionsChanged();
         }
-        _ = OnOptionsChanged();
     }
     public void OnExit() => _indexingConfig.Save();
 

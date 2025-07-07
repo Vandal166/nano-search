@@ -10,11 +10,6 @@ using Wpf.Ui.Controls;
 
 namespace NanoSearch.UI.Windows;
 
-/*TODO attribute this guy
- * <a href="https://www.flaticon.com/free-icons/file-explorer" title="file-explorer icons">File-explorer icons created by wen_ardhie - Flaticon</a>
- * or: https://www.flaticon.com/free-icon/file-management_6890088?term=file+explorer&related_id=6890088
- */ 
-
 public partial class SearchWindow : FluentWindow
 {
     private readonly ISearchService _searchService;

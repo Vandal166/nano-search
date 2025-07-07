@@ -6,7 +6,7 @@ public class RegexSearchFilter : ISearchFilter
 {
     public ImmutableHashSet<string>? Apply(ImmutableHashSet<string>? rawResults, string query)
     {
-        return rawResults?.Take(50)
+        return rawResults?.Take(25)
             .ToImmutableHashSet();
     }
 }

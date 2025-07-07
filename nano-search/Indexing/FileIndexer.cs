@@ -13,18 +13,19 @@ public sealed class FileIndexer : IFileCountProvider
 {
     public RadixTree<ImmutableHashSet<string>> RadixTree { get; } = new RadixTree<ImmutableHashSet<string>>();
     private readonly ConcurrentDictionary<string, ImmutableHashSet<string>> _fileDictionary = new();
-    private readonly FilterPipeline _filterPipeline;
+    private FilterPipeline _filterPipeline;
     public ulong Count => RadixTree.Count;
     
     public FileIndexer(FilterPipeline filterPipeline, IConfigService<IndexingOptions> opts)
     {
         _filterPipeline = filterPipeline;
         
-        IndexFileSystem(opts.Options.DrivesToIndex);
+        IndexFileSystem(opts.Options.DrivesToIndex, _filterPipeline);
     }
 
-    public void IndexFileSystem(HashSet<string> rootPath)
+    public void IndexFileSystem(HashSet<string> rootPath, FilterPipeline filterPipeline)
     {
+        _filterPipeline = filterPipeline;
         if(RadixTree.Count > 0)
         {
             RadixTree.Clear();
