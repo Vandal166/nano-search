@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Reflection;
+using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using NanoSearch.Configuration;
 using NanoSearch.Configuration.Indexing;
@@ -15,57 +17,77 @@ namespace NanoSearch;
 
 public partial class App : Application
 {
+    private static Mutex? _singleInstanceMutex;
+    
     private NotifyIcon? _trayIcon;
     private ServiceProvider _serviceProvider = null!;
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        base.OnStartup(e);
-        ApplicationThemeManager.ApplySystemTheme(updateAccent: true);
-           
-        // DI setup
-        var services = new ServiceCollection()
-            .AddIndexing()
-            .AddLaunchers()
-            .AddSearchUI()
-            .AddSettingsUI()
-            .AddNavigation();
-        
-        _serviceProvider = services.BuildServiceProvider();
-        _serviceProvider.GetRequiredService<ValidationErrorBox<IndexingOptions>>();
-        _serviceProvider.GetRequiredService<ValidationErrorBox<KeybindingsOptions>>();
-        
-        var searchWindow = _serviceProvider.GetRequiredService<SearchWindow>();
-        
-        // if Show in Tray is true in the cfg then load the tray icon
-        if (_serviceProvider.GetRequiredService<IConfigService<IndexingOptions>>().Options.ShowInTray)
+        _singleInstanceMutex = new Mutex(true, "NanoSearchSingleInstance", out var isSingleInstance);
+        if (!isSingleInstance)
         {
-            _trayIcon = new NotifyIcon
-            {
-                Icon = new System.Drawing.Icon("Resources\\nano-search.ico"),
-                Visible = true,
-                Text = "nano-search"
-            };
-            
-            _trayIcon.MouseClick += TrayIcon_MouseClick; // on click
-            _trayIcon.DoubleClick += TrayIcon_DoubleClick; // on double click
+            Environment.Exit(0); // exiting if another instance is already running of the app
+            return;
         }
 
-        searchWindow.Show();
-        if (ApplicationThemeManager.GetSystemTheme() == SystemTheme.Light)
+        try
         {
-            var messageBox = new MessageBox
+            base.OnStartup(e);
+            ApplicationThemeManager.ApplySystemTheme(updateAccent: true);
+
+            // DI setup
+            var services = new ServiceCollection()
+                .AddIndexing()
+                .AddLaunchers()
+                .AddSearchUI()
+                .AddSettingsUI()
+                .AddNavigation();
+
+            _serviceProvider = services.BuildServiceProvider();
+            _serviceProvider.GetRequiredService<ValidationErrorBox<IndexingOptions>>();
+            _serviceProvider.GetRequiredService<ValidationErrorBox<KeybindingsOptions>>();
+
+            var searchWindow = _serviceProvider.GetRequiredService<SearchWindow>();
+
+            // if Show in Tray is true in the cfg then load the tray icon
+            if (_serviceProvider.GetRequiredService<IConfigService<IndexingOptions>>().Options.ShowInTray)
             {
-                Title = "Light Mode Detected",
-                Content = "Light mode detected, switch your system to Dark mode as light mode is not supported yet.",
-                CloseButtonText = "OK",
-                ShowTitle = true
-            };
-            messageBox.ShowDialogAsync();
+                var assembly = Assembly.GetExecutingAssembly();
+                using var stream = assembly.GetManifestResourceStream("NanoSearch.Resources.nano-search.ico");
+                _trayIcon = new NotifyIcon
+                {
+                    Icon = new System.Drawing.Icon(stream),
+                    Visible = true,
+                    Text = "nano-search"
+                };
+
+                _trayIcon.MouseClick += TrayIcon_MouseClick; // on click
+                _trayIcon.DoubleClick += TrayIcon_DoubleClick; // on double click
+            }
+
+            searchWindow.Show();
+            if (ApplicationThemeManager.GetSystemTheme() == SystemTheme.Light)
+            {
+                MessageBoxExtensions.Setup
+                (
+                    "Light Mode Detected",
+                    "Light mode detected, switch your system to Dark mode as light mode is not supported yet."
+                ).Display();
+            }
+
+            SystemThemeWatcher.Watch(searchWindow);
+            _serviceProvider.GetRequiredService<IHotKeyService>();
         }
-        SystemThemeWatcher.Watch(searchWindow);
-        _serviceProvider.GetRequiredService<IHotKeyService>();
-        
+        catch (Exception ex)
+        {
+            File.WriteAllText("error.log", ex.ToString());
+            MessageBoxExtensions.Setup
+            (
+                "Error",
+                "An error occurred while starting the application. Please check the error.log file for more details."
+            ).Display();
+        }
     }
 
     private void TrayIcon_DoubleClick(object? sender, EventArgs e)
