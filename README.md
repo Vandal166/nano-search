@@ -27,7 +27,7 @@ It indexes files on any specified drive from the configuration options and allow
     <span id="inc3">3. *include* (not skip) a file that has the specified extension</span>
     4. skip files that does not meet the regex name pattern specified in the configuration file
     - The order of the applied filters are as above, a file is indexed once every filter hasn't skipped the file
-  - **For Directories skipping**:
+  - **Directory filters**:
     1. basically the same as for files except it  skips commonly named directories(such as `System`) instead of point c) in [c)](#inc3)
 - Configurable hotkeys for showing the Search Window
 - Configurable hotkeys for navigating the search results
