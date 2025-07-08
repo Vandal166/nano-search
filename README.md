@@ -21,18 +21,18 @@ It indexes files on any specified drive from the configuration options and allow
 - Navigating the search results via arrow keys
 - Choosing which drives to index
 - Fully configurable indexing options:
-  - For Files skipping:
-    1. any file leading with an character
-    2. any file that has the attribute
-    <span id="inc3">3. *including* (not skipping) a file that has the specified extension</span>
-    4. any file that does not meet the regex name pattern specified in the configuration file
+  - **File filters**:
+    1. skip files starting with specific characters
+    2. skip files based on file attributes
+    <span id="inc3">3. *include* (not skip) a file that has the specified extension</span>
+    4. skip files that does not meet the regex name pattern specified in the configuration file
     - The order of the applied filters are as above, a file is indexed once every filter hasn't skipped the file
-  - For Directories skipping:
+  - **For Directories skipping**:
     1. basically the same as for files except it  skips commonly named directories(such as `System`) instead of point c) in [c)](#inc3)
 - Configurable hotkeys for showing the Search Window
 - Configurable hotkeys for navigating the search results
-- Reindexing the files again
-- Toggling the appearance of the Tray Icon in the tray bar
+- Reindex the files again
+- Toggle the tray icon
 - Any of the settings may be restored to their default state
 - Any error while executing those features will display an user-friendly notification
 
