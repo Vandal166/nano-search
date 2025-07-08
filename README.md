@@ -1,14 +1,11 @@
 # nano-search
 
-**nano-search** is a fast, file indexing and background-based search app for Windows made with WPF.  
+**nano-search** is a fast, background-based file indexing and search tool for Windows, built using WPF 
 It indexes files on any specified drive from the configuration options and allows pattern-based file lookup using glob syntax or just simply search plain file names. Internally, it uses a **Radix Tree** for efficient storage and retrieval.
 
-
-## App Showcase
-![App Showcase](showcase.gif)
-
-## Tray Showcase
-![Tray Showcase](showcase_tray.gif)
+| Search Window                          | Tray Icon Interaction             |
+|---------------------------------------|-----------------------------------|
+| ![App Showcase](showcase.gif)         | ![Tray Showcase](showcase_tray.gif) |
 
 
 ## Features
@@ -26,9 +23,9 @@ It indexes files on any specified drive from the configuration options and allow
   - For Files skipping:
     1. any file leading with an character
     2. any file that has the attribute
-    <span id="inc3">3. *including* (not skipping) an file that has the specified extension</span>
+    <span id="inc3">3. *including* (not skipping) a file that has the specified extension</span>
     4. any file that does not meet the regex name pattern specified in the configuration file
-    - The order of the applied filters are as above, an file is indexed once every filter hasn't skipped the file
+    - The order of the applied filters are as above, a file is indexed once every filter hasn't skipped the file
   - For Directories skipping:
     1. basically the same as for files except it  skips commonly named directories(such as `System`) instead of point c) in [c)](#inc3)
 - Configurable hotkeys for showing the Search Window
@@ -45,8 +42,6 @@ Why not use the NTFS Master File Table (MFT) to scan?
 - works only for NTFS
 - hard p/invoke implementatino ;C
 - would need to fallback to standard win32 if NTFS is not available
-
-Explorer Icon from [Flaticon](https://www.flaticon.com)
 
 ## Building the Project
 
@@ -66,6 +61,8 @@ This project uses the following libraries:
 
 - [WPF UI](https://github.com/lepoco/wpfui) ([MIT License](https://github.com/lepoco/wpfui?tab=MIT-1-ov-file))
 - [Dependency Injection](https://www.nuget.org/packages/Microsoft.Extensions.DependencyInjection)
+  
+Explorer Icon from [Flaticon](https://www.flaticon.com)
 
 ## License
 
