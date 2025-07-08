@@ -6,6 +6,7 @@ It indexes files on any specified drive from the configuration options and allow
 | Search Window                          | Tray Icon Interaction             |
 |---------------------------------------|-----------------------------------|
 | ![App Showcase](showcase.gif)         | ![Tray Showcase](showcase_tray.gif) |
+> Click the images to view in full resolution.
 
 
 ## Features
