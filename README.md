@@ -1,6 +1,6 @@
 # nano-search
 
-**nano-search** is a fast, file indexing and search tool for Windows made with WPF.  
+**nano-search** is a fast, file indexing and background-based search app for Windows made with WPF.  
 It indexes files on any specified drive from the configuration options and allows pattern-based file lookup using glob syntax or just simply search plain file names. Internally, it uses a **Radix Tree** for efficient storage and retrieval.
 
 
